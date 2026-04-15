@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "Bash(curl -s http://localhost:5173/getfacil/)",
+      "Bash(node_modules/.bin/vite --version)",
+      "Bash(cmd.exe /c \"where npm 2>&1 && node --version 2>&1\")",
+      "Bash(cmd.exe /c \"dir \\\\\"C:\\\\\\\\Program Files\\\\\\\\nodejs\\\\\\\\npm.cmd\\\\\" 2>&1 | head -3\")"
+    ]
+  }
+}
