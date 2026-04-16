@@ -26,7 +26,7 @@ export function Header({ showBack = false, backTo = '/', backLabel = 'Voltar' })
   };
 
   const logoTextStyle = {
-    fontFamily: 'var(--font-display)',
+    fontFamily: 'var(--font-logo)',
     fontSize: '1.1rem',
     fontWeight: '700',
     color: '#ffffff',

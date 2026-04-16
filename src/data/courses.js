@@ -1,308 +1,241 @@
-// GetFutureToday — Mock Course Data
-// Replace with API calls when backend is ready
+// GetFutureToday — Course Data
 
 export const STUDENT_ID = 'student1';
 
 export const courses = [
   {
     id: 'c1',
-    title: 'Desenvolvimento Web Completo',
-    subtitle: 'Do HTML ao React',
-    description: 'Domine as tecnologias essenciais da web moderna: HTML semântico, CSS avançado, JavaScript ES6+ e React. Construa projetos reais do zero ao deploy.',
-    coverColor: 'linear-gradient(135deg, #0066ff 0%, #00d4ff 100%)',
+    title: 'Canva',
+    subtitle: 'Design Gráfico Profissional',
+    description: 'Domine o Canva do zero ao avançado. Crie peças visuais impactantes para redes sociais, apresentações e materiais profissionais sem precisar ser designer.',
+    coverColor: 'linear-gradient(135deg, #0a0a0f 0%, #00d4ff 100%)',
+    accentColor: '#00d4ff',
     modules: [
       {
         id: 'm1',
-        title: 'Fundamentos do HTML',
+        title: 'Primeiros Passos no Canva',
         order: 1,
         lessons: [
-          { id: 'l1', title: 'Estrutura e Semântica HTML', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '18:30', order: 1 },
-          { id: 'l2', title: 'Tags e Atributos Essenciais', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '22:15', order: 2 },
-          { id: 'l3', title: 'Formulários e Validação', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '19:45', order: 3 },
+          { id: 'l1', title: 'Interface e Navegação', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '15:00', order: 1 },
+          { id: 'l2', title: 'Templates e Personalização', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '18:30', order: 2 },
+          { id: 'l3', title: 'Tipografia e Cores', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '20:00', order: 3 },
         ],
         quiz: {
           id: 'q1',
-          title: 'Quiz — HTML Fundamentos',
+          title: 'Quiz — Primeiros Passos',
           questions: [
-            { id: 'qq1', question: 'Qual tag cria um parágrafo em HTML?', options: ['<paragraph>', '<p>', '<text>', '<para>'], correct: 1 },
-            { id: 'qq2', question: 'O que significa HTML?', options: ['Hyper Text Markup Language', 'High Tech Modern Language', 'Hyper Transfer Markup Language', 'Home Tool Markup Language'], correct: 0 },
-            { id: 'qq3', question: 'Qual atributo define o destino de um link?', options: ['src', 'href', 'link', 'url'], correct: 1 },
+            { id: 'qq1', question: 'Qual recurso do Canva permite reutilizar elementos visuais?', options: ['Filtros', 'Elementos', 'Brand Kit', 'Grade'], correct: 2 },
+            { id: 'qq2', question: 'O que é um template no Canva?', options: ['Um plugin externo', 'Um modelo pré-configurado editável', 'Uma fonte especial', 'Um tipo de exportação'], correct: 1 },
+            { id: 'qq3', question: 'Qual formato é ideal para exportar imagens com fundo transparente?', options: ['JPG', 'PDF', 'PNG', 'SVG'], correct: 2 },
           ]
         }
       },
       {
         id: 'm2',
-        title: 'CSS Moderno',
+        title: 'Design para Redes Sociais',
         order: 2,
         lessons: [
-          { id: 'l4', title: 'Seletores e Especificidade', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '25:00', order: 1 },
-          { id: 'l5', title: 'Flexbox na Prática', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '30:00', order: 2 },
-          { id: 'l6', title: 'CSS Grid Layout', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '28:30', order: 3 },
+          { id: 'l4', title: 'Tamanhos e Formatos por Plataforma', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '22:00', order: 1 },
+          { id: 'l5', title: 'Criando Stories e Reels', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '25:00', order: 2 },
+          { id: 'l6', title: 'Identidade Visual Consistente', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '28:00', order: 3 },
         ],
         quiz: {
           id: 'q2',
-          title: 'Quiz — CSS Moderno',
+          title: 'Quiz — Redes Sociais',
           questions: [
-            { id: 'qq4', question: 'Qual propriedade altera a cor do texto?', options: ['text-color', 'font-color', 'color', 'text-style'], correct: 2 },
-            { id: 'qq5', question: 'Como centralizar elementos com Flexbox?', options: ['center: true', 'justify-content: center', 'align: center', 'flex-center: yes'], correct: 1 },
+            { id: 'qq4', question: 'Qual o tamanho padrão de um post quadrado para Instagram?', options: ['1920x1080px', '1080x1920px', '1080x1080px', '800x800px'], correct: 2 },
+            { id: 'qq5', question: 'O que é identidade visual?', options: ['Apenas o logo da marca', 'Conjunto de elementos visuais que representam a marca', 'A paleta de cores isolada', 'O estilo tipográfico'], correct: 1 },
           ]
         }
       },
-      {
-        id: 'm3',
-        title: 'JavaScript ES6+',
-        order: 3,
-        lessons: [
-          { id: 'l7', title: 'Arrow Functions e Destructuring', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '32:00', order: 1 },
-          { id: 'l8', title: 'Promises e Async/Await', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '38:00', order: 2 },
-          { id: 'l9', title: 'DOM e Eventos', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '35:00', order: 3 },
-        ],
-        quiz: {
-          id: 'q3',
-          title: 'Quiz — JavaScript',
-          questions: [
-            { id: 'qq6', question: 'Qual método adiciona elemento ao final de um array?', options: ['push()', 'add()', 'append()', 'insert()'], correct: 0 },
-            { id: 'qq7', question: 'O que retorna typeof null?', options: ['"null"', '"undefined"', '"object"', '"boolean"'], correct: 2 },
-          ]
-        }
-      }
     ],
     finalExam: {
       id: 'fe1',
-      title: 'Prova Final — Desenvolvimento Web',
+      title: 'Prova Final — Canva',
       questions: [
-        { id: 'fq1', question: 'Qual é a estrutura básica de um documento HTML?', options: ['<html><head><body>', '<head><html><body>', '<body><head><html>', '<html><body><head>'], correct: 0 },
-        { id: 'fq2', question: 'O que é o DOM?', options: ['Document Object Model', 'Data Object Model', 'Document Oriented Model', 'Data Oriented Method'], correct: 0 },
-        { id: 'fq3', question: 'Qual valor de display coloca elementos em linha?', options: ['block', 'inline', 'flex', 'grid'], correct: 1 },
-        { id: 'fq4', question: 'Como adicionar evento de clique em JavaScript?', options: ['onClick()', 'addEventListener("click")', 'addClick()', 'setClick()'], correct: 1 },
-        { id: 'fq5', question: 'Qual propriedade CSS centraliza um bloco horizontalmente?', options: ['text-align: center', 'margin: 0 auto', 'align: center', 'center: true'], correct: 1 },
+        { id: 'fq1', question: 'O que é o Brand Kit no Canva?', options: ['Um conjunto de templates gratuitos', 'Um espaço para guardar cores, fontes e logos da marca', 'Uma ferramenta de exportação', 'Um editor de vídeos'], correct: 1 },
+        { id: 'fq2', question: 'Qual formato é melhor para impressão?', options: ['PNG', 'JPG', 'PDF', 'GIF'], correct: 2 },
+        { id: 'fq3', question: 'O que são elementos no Canva?', options: ['Arquivos de texto', 'Ícones, formas, ilustrações e imagens disponíveis na biblioteca', 'Fontes instaladas', 'Filtros de foto'], correct: 1 },
+        { id: 'fq4', question: 'Como criar um design colaborativo no Canva?', options: ['Exportar e enviar por e-mail', 'Usando a função de compartilhamento com link de edição', 'Salvando em PDF', 'Não é possível colaborar'], correct: 1 },
+        { id: 'fq5', question: 'O que é o recurso "Magic Resize"?', options: ['Aumenta a qualidade da imagem', 'Redimensiona automaticamente o design para outros formatos', 'Remove o fundo', 'Muda as cores automaticamente'], correct: 1 },
       ]
     }
   },
   {
     id: 'c2',
-    title: 'Marketing Digital',
-    subtitle: 'Estratégia e Performance',
-    description: 'Aprenda a criar campanhas de alto impacto, dominar redes sociais, Google Ads e analisar resultados com métricas reais de mercado.',
-    coverColor: 'linear-gradient(135deg, #7c3aed 0%, #db2777 100%)',
+    title: 'Pensamento Computacional',
+    subtitle: 'Lógica e Resolução de Problemas',
+    description: 'Desenvolva o raciocínio lógico e estruturado para resolver problemas complexos. Aprenda decomposição, padrões, abstração e algoritmos na prática.',
+    coverColor: 'linear-gradient(135deg, #0a0a0f 0%, #0088ff 100%)',
+    accentColor: '#0088ff',
     modules: [
       {
-        id: 'm4',
-        title: 'Fundamentos do Marketing Digital',
+        id: 'm3',
+        title: 'Os 4 Pilares do Pensamento Computacional',
         order: 1,
         lessons: [
-          { id: 'l10', title: 'O Ecossistema Digital', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '20:00', order: 1 },
-          { id: 'l11', title: 'Funil de Vendas e Jornada do Cliente', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '25:00', order: 2 },
-          { id: 'l12', title: 'SEO na Prática', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '30:00', order: 3 },
+          { id: 'l7', title: 'Decomposição de Problemas', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '20:00', order: 1 },
+          { id: 'l8', title: 'Reconhecimento de Padrões', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '22:00', order: 2 },
+          { id: 'l9', title: 'Abstração e Algoritmos', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '25:00', order: 3 },
         ],
         quiz: {
-          id: 'q4',
-          title: 'Quiz — Fundamentos',
+          id: 'q3',
+          title: 'Quiz — Os 4 Pilares',
           questions: [
-            { id: 'qq8', question: 'O que é um lead?', options: ['Um cliente fiel', 'Um potencial cliente', 'Um funcionário', 'Um fornecedor'], correct: 1 },
-            { id: 'qq9', question: 'O que significa SEO?', options: ['Search Engine Optimization', 'Social Engagement Output', 'Sales Engagement Option', 'Search Engagement Output'], correct: 0 },
+            { id: 'qq6', question: 'O que é decomposição no pensamento computacional?', options: ['Programar em partes', 'Dividir um problema complexo em partes menores', 'Usar matemática avançada', 'Criar algoritmos'], correct: 1 },
+            { id: 'qq7', question: 'O que é abstração?', options: ['Ignorar detalhes irrelevantes para focar no essencial', 'Criar imagens mentais', 'Escrever código abstraído', 'Usar pseudocódigo'], correct: 0 },
+            { id: 'qq8', question: 'O que é um algoritmo?', options: ['Um tipo de programa', 'Uma sequência lógica de passos para resolver um problema', 'Uma linguagem de programação', 'Um diagrama de fluxo'], correct: 1 },
           ]
         }
       },
       {
-        id: 'm5',
-        title: 'Tráfego Pago e Redes Sociais',
+        id: 'm4',
+        title: 'Algoritmos na Prática',
         order: 2,
         lessons: [
-          { id: 'l13', title: 'Meta Ads (Facebook e Instagram)', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '35:00', order: 1 },
-          { id: 'l14', title: 'Google Ads Search', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '32:00', order: 2 },
-          { id: 'l15', title: 'Análise de Métricas e ROI', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '28:00', order: 3 },
+          { id: 'l10', title: 'Fluxogramas e Pseudocódigo', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '28:00', order: 1 },
+          { id: 'l11', title: 'Estruturas de Decisão', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '30:00', order: 2 },
+          { id: 'l12', title: 'Repetição e Loops', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '25:00', order: 3 },
         ],
         quiz: {
-          id: 'q5',
-          title: 'Quiz — Tráfego Pago',
+          id: 'q4',
+          title: 'Quiz — Algoritmos',
           questions: [
-            { id: 'qq10', question: 'Qual métrica mede o alcance de uma publicação?', options: ['Likes', 'Impressões', 'Comentários', 'Salvos'], correct: 1 },
-            { id: 'qq11', question: 'O que é CTR?', options: ['Click Through Rate', 'Customer Total Revenue', 'Content Transfer Rate', 'Click To Revenue'], correct: 0 },
+            { id: 'qq9', question: 'Para que serve um fluxograma?', options: ['Escrever código', 'Representar visualmente o fluxo de um algoritmo', 'Fazer cálculos', 'Criar bancos de dados'], correct: 1 },
+            { id: 'qq10', question: 'O que é uma estrutura de repetição?', options: ['Um tipo de variável', 'Um bloco que executa instruções múltiplas vezes', 'Uma condição lógica', 'Um método de ordenação'], correct: 1 },
           ]
         }
-      }
+      },
     ],
     finalExam: {
       id: 'fe2',
-      title: 'Prova Final — Marketing Digital',
+      title: 'Prova Final — Pensamento Computacional',
       questions: [
-        { id: 'fq6', question: 'O que significa ROI?', options: ['Return on Investment', 'Rate of Interest', 'Return of Income', 'Rate on Investment'], correct: 0 },
-        { id: 'fq7', question: 'Qual é o objetivo do remarketing?', options: ['Alcançar novos clientes', 'Reengajar visitantes anteriores', 'Criar novos produtos', 'Reduzir custos'], correct: 1 },
-        { id: 'fq8', question: 'O que é CPC?', options: ['Cost Per Campaign', 'Cost Per Click', 'Customer Purchase Cycle', 'Content Per Click'], correct: 1 },
+        { id: 'fq6', question: 'Quais são os 4 pilares do pensamento computacional?', options: ['Código, dados, redes, segurança', 'Decomposição, padrões, abstração, algoritmos', 'Lógica, matemática, física, química', 'Input, processo, output, feedback'], correct: 1 },
+        { id: 'fq7', question: 'Reconhecimento de padrões ajuda a:', options: ['Criar programas mais rápidos', 'Identificar semelhanças para aplicar soluções já conhecidas', 'Simplificar o código', 'Reduzir memória usada'], correct: 1 },
+        { id: 'fq8', question: 'Um algoritmo deve ser:', options: ['Complexo e detalhado', 'Finito, preciso e com início e fim definidos', 'Escrito em inglês', 'Apenas visual'], correct: 1 },
+        { id: 'fq9', question: 'O que é pseudocódigo?', options: ['Código com erros', 'Uma descrição textual de algoritmo próxima da linguagem natural', 'Um diagrama de fluxo', 'Código compilado'], correct: 1 },
+        { id: 'fq10', question: 'Qual é o benefício de decompor um problema?', options: ['Torna o problema mais difícil', 'Facilita a resolução ao dividir em partes gerenciáveis', 'Elimina a necessidade de algoritmos', 'Reduz a necessidade de testes'], correct: 1 },
       ]
     }
   },
   {
     id: 'c3',
-    title: 'Excel & Power BI',
-    subtitle: 'Análise de Dados Avançada',
-    description: 'Domine fórmulas avançadas, tabelas dinâmicas, macros VBA e visualizações profissionais com Power BI. Transforme dados em decisões.',
-    coverColor: 'linear-gradient(135deg, #059669 0%, #34d399 100%)',
+    title: 'Guia de Sobrevivência Offline',
+    subtitle: 'Habilidades para o Mundo Real',
+    description: 'Desenvolva competências práticas essenciais para o dia a dia profissional e pessoal — comunicação, organização, finanças pessoais e produtividade sem depender da tecnologia.',
+    coverColor: 'linear-gradient(135deg, #0a0a0f 0%, #0055cc 100%)',
+    accentColor: '#0055cc',
     modules: [
       {
-        id: 'm6',
-        title: 'Excel Avançado',
+        id: 'm5',
+        title: 'Comunicação e Relacionamentos',
         order: 1,
         lessons: [
-          { id: 'l16', title: 'PROCV, ÍNDICE e CORRESP', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '25:00', order: 1 },
-          { id: 'l17', title: 'Tabelas Dinâmicas Master', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '30:00', order: 2 },
-          { id: 'l18', title: 'Macros e VBA Básico', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '35:00', order: 3 },
+          { id: 'l13', title: 'Comunicação Assertiva', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '22:00', order: 1 },
+          { id: 'l14', title: 'Escuta Ativa e Empatia', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '18:00', order: 2 },
+          { id: 'l15', title: 'Networking Genuíno', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '20:00', order: 3 },
         ],
         quiz: {
-          id: 'q6',
-          title: 'Quiz — Excel Avançado',
+          id: 'q5',
+          title: 'Quiz — Comunicação',
           questions: [
-            { id: 'qq12', question: 'O que faz a função PROCV?', options: ['Procura vertical em tabelas', 'Procura horizontal', 'Soma valores', 'Conta células'], correct: 0 },
-            { id: 'qq13', question: 'Qual função conta células não vazias?', options: ['CONT.SE', 'CONT.VALORES', 'CONTAR', 'SOMA'], correct: 1 },
+            { id: 'qq11', question: 'O que é comunicação assertiva?', options: ['Falar de forma agressiva', 'Expressar pensamentos com clareza e respeito', 'Concordar com tudo', 'Evitar conflitos'], correct: 1 },
+            { id: 'qq12', question: 'O que é escuta ativa?', options: ['Ouvir enquanto faz outras coisas', 'Prestar atenção plena ao interlocutor', 'Anotar tudo que ouve', 'Repetir o que a outra pessoa disse'], correct: 1 },
+            { id: 'qq13', question: 'Networking genuíno significa:', options: ['Adicionar o máximo de pessoas possível', 'Construir relações de valor mútuo e autênticas', 'Distribuir cartões de visita', 'Estar em todas as redes sociais'], correct: 1 },
           ]
         }
       },
       {
-        id: 'm7',
-        title: 'Power BI na Prática',
+        id: 'm6',
+        title: 'Organização e Produtividade',
         order: 2,
         lessons: [
-          { id: 'l19', title: 'Importando e Transformando Dados', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '28:00', order: 1 },
-          { id: 'l20', title: 'Criando Dashboards Profissionais', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '40:00', order: 2 },
-          { id: 'l21', title: 'DAX Fundamentos', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '35:00', order: 3 },
+          { id: 'l16', title: 'Gestão do Tempo', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '25:00', order: 1 },
+          { id: 'l17', title: 'Método GTD Simplificado', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '28:00', order: 2 },
+          { id: 'l18', title: 'Finanças Pessoais Básicas', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '30:00', order: 3 },
         ],
         quiz: {
-          id: 'q7',
-          title: 'Quiz — Power BI',
+          id: 'q6',
+          title: 'Quiz — Organização',
           questions: [
-            { id: 'qq14', question: 'O que é DAX?', options: ['Data Analysis Expressions', 'Dynamic Axis Extension', 'Data Aggregation Export', 'Dashboard Analytics Extension'], correct: 0 },
+            { id: 'qq14', question: 'O que é a técnica Pomodoro?', options: ['Uma dieta alimentar', 'Trabalhar em blocos de tempo focado com pausas', 'Um método de meditação', 'Uma forma de organizar arquivos'], correct: 1 },
+            { id: 'qq15', question: 'GTD significa:', options: ['Get Things Done', 'Go To Development', 'Great Task Design', 'General To-Do'], correct: 0 },
           ]
         }
-      }
+      },
     ],
     finalExam: {
       id: 'fe3',
-      title: 'Prova Final — Excel & Power BI',
+      title: 'Prova Final — Guia de Sobrevivência Offline',
       questions: [
-        { id: 'fq9', question: 'Qual função une textos no Excel?', options: ['CONCAT', 'JOIN', 'MERGE', 'UNITE'], correct: 0 },
-        { id: 'fq10', question: 'No Power BI, o que é um relacionamento?', options: ['Ligação entre tabelas', 'Um tipo de gráfico', 'Um filtro avançado', 'Uma fórmula DAX'], correct: 0 },
+        { id: 'fq11', question: 'Qual é o principal benefício da comunicação assertiva?', options: ['Ganhar todos os debates', 'Expressar necessidades com respeito e clareza', 'Evitar toda forma de conflito', 'Falar mais alto'], correct: 1 },
+        { id: 'fq12', question: 'O que é inteligência financeira básica?', options: ['Investir na bolsa', 'Entender receitas, despesas e poupar conscientemente', 'Ter cartão de crédito', 'Saber fazer planilhas'], correct: 1 },
+        { id: 'fq13', question: 'Por que a escuta ativa é importante?', options: ['Para parecer mais inteligente', 'Porque cria conexões reais e evita mal-entendidos', 'Para falar menos', 'Para memorizar informações'], correct: 1 },
+        { id: 'fq14', question: 'Qual é o primeiro passo para uma boa gestão do tempo?', options: ['Trabalhar mais horas', 'Identificar e priorizar tarefas por importância e urgência', 'Usar o celular menos', 'Acordar mais cedo'], correct: 1 },
+        { id: 'fq15', question: 'O networking é mais eficaz quando:', options: ['Feito apenas em eventos formais', 'Baseado em troca de valor e autenticidade', 'Focado em pessoas famosas', 'Feito online exclusivamente'], correct: 1 },
       ]
     }
   },
   {
     id: 'c4',
-    title: 'Design UI/UX com Figma',
-    subtitle: 'Do Conceito ao Protótipo',
-    description: 'Aprenda os princípios de design centrado no usuário, crie sistemas de design escaláveis e prototipe interfaces de alta fidelidade no Figma.',
-    coverColor: 'linear-gradient(135deg, #ea580c 0%, #f59e0b 100%)',
+    title: 'Design Instrucional',
+    subtitle: 'Criação de Experiências de Aprendizagem',
+    description: 'Aprenda a projetar cursos e treinamentos que realmente ensinam. Domine taxonomias, metodologias ativas, mapas de conteúdo e avaliação de aprendizagem.',
+    coverColor: 'linear-gradient(135deg, #0a0a0f 0%, #003399 100%)',
+    accentColor: '#003399',
     modules: [
       {
-        id: 'm8',
-        title: 'Fundamentos de UI/UX',
+        id: 'm7',
+        title: 'Fundamentos do Design Instrucional',
         order: 1,
         lessons: [
-          { id: 'l22', title: 'Princípios de Design Visual', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '22:00', order: 1 },
-          { id: 'l23', title: 'Research e Personas', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '28:00', order: 2 },
-          { id: 'l24', title: 'Wireframes e Fluxos', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '30:00', order: 3 },
+          { id: 'l19', title: 'O que é Design Instrucional', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '20:00', order: 1 },
+          { id: 'l20', title: 'Taxonomia de Bloom', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '25:00', order: 2 },
+          { id: 'l21', title: 'Análise de Público e Necessidades', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '22:00', order: 3 },
+        ],
+        quiz: {
+          id: 'q7',
+          title: 'Quiz — Fundamentos DI',
+          questions: [
+            { id: 'qq16', question: 'O que é Design Instrucional?', options: ['Design de interfaces', 'Processo de planejar experiências de aprendizagem eficazes', 'Criar apostilas', 'Dar aulas online'], correct: 1 },
+            { id: 'qq17', question: 'A Taxonomia de Bloom organiza:', options: ['Tipos de alunos', 'Níveis de objetivos educacionais', 'Estilos de ensino', 'Ferramentas de criação'], correct: 1 },
+            { id: 'qq18', question: 'O que é análise de público-alvo no DI?', options: ['Pesquisa de mercado', 'Entender quem são os alunos e suas necessidades de aprendizagem', 'Definir o preço do curso', 'Escolher a plataforma'], correct: 1 },
+          ]
+        }
+      },
+      {
+        id: 'm8',
+        title: 'Estrutura e Avaliação',
+        order: 2,
+        lessons: [
+          { id: 'l22', title: 'Mapa de Conteúdo e Storyboard', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '30:00', order: 1 },
+          { id: 'l23', title: 'Metodologias Ativas de Aprendizagem', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '28:00', order: 2 },
+          { id: 'l24', title: 'Avaliação e Feedback Eficaz', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '25:00', order: 3 },
         ],
         quiz: {
           id: 'q8',
-          title: 'Quiz — UI/UX Fundamentos',
+          title: 'Quiz — Estrutura e Avaliação',
           questions: [
-            { id: 'qq15', question: 'O que é um wireframe?', options: ['Protótipo de alta fidelidade', 'Esboço de baixa fidelidade', 'Código final', 'Documento de requisitos'], correct: 1 },
-            { id: 'qq16', question: 'O que significa UX?', options: ['User Experience', 'Ultra Extended', 'User Extension', 'Unified Experience'], correct: 0 },
+            { id: 'qq19', question: 'O que é um storyboard de curso?', options: ['Um vídeo de apresentação', 'Um roteiro visual detalhado de cada tela/aula do curso', 'Uma lista de materiais', 'Um questionário'], correct: 1 },
+            { id: 'qq20', question: 'Metodologias ativas priorizam:', options: ['Aula expositiva tradicional', 'O protagonismo e participação ativa do aluno', 'Leitura de apostilas', 'Provas escritas'], correct: 1 },
           ]
         }
       },
-      {
-        id: 'm9',
-        title: 'Figma Avançado',
-        order: 2,
-        lessons: [
-          { id: 'l25', title: 'Auto Layout e Componentes', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '35:00', order: 1 },
-          { id: 'l26', title: 'Design System Completo', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '42:00', order: 2 },
-          { id: 'l27', title: 'Prototipagem e Animações', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '38:00', order: 3 },
-        ],
-        quiz: {
-          id: 'q9',
-          title: 'Quiz — Figma',
-          questions: [
-            { id: 'qq17', question: 'O que é um Design System?', options: ['Conjunto de componentes e padrões reutilizáveis', 'Um software de design', 'Apenas uma paleta de cores', 'Um framework CSS'], correct: 0 },
-          ]
-        }
-      }
     ],
     finalExam: {
       id: 'fe4',
-      title: 'Prova Final — Design UI/UX',
+      title: 'Prova Final — Design Instrucional',
       questions: [
-        { id: 'fq11', question: 'O que é prototipagem?', options: ['Criar um modelo interativo do produto', 'Escrever código final', 'Fazer pesquisa com usuários', 'Definir paleta de cores'], correct: 0 },
-        { id: 'fq12', question: 'Qual é o foco do design centrado no usuário?', options: ['Tecnologia bonita', 'Atender necessidades reais dos usuários', 'Velocidade de desenvolvimento', 'Redução de custos'], correct: 1 },
+        { id: 'fq16', question: 'Qual modelo clássico de DI segue as etapas: Análise, Design, Desenvolvimento, Implementação e Avaliação?', options: ['BLOOM', 'ADDIE', 'SCRUM', 'AGILE'], correct: 1 },
+        { id: 'fq17', question: 'Qual nível da Taxonomia de Bloom é o mais elevado?', options: ['Compreender', 'Aplicar', 'Criar', 'Analisar'], correct: 2 },
+        { id: 'fq18', question: 'O que são objetivos de aprendizagem?', options: ['O conteúdo do curso', 'Declarações que descrevem o que o aluno será capaz de fazer ao final', 'O tempo de duração do curso', 'O número de aulas'], correct: 1 },
+        { id: 'fq19', question: 'Uma avaliação formativa serve para:', options: ['Atribuir nota final', 'Monitorar o progresso e dar feedback durante o processo', 'Certificar o aluno', 'Comparar alunos'], correct: 1 },
+        { id: 'fq20', question: 'O que é aprendizagem significativa?', options: ['Aprender muitas coisas rapidamente', 'Conectar novo conhecimento a conhecimentos já existentes de forma relevante', 'Memorizar conteúdos', 'Assistir muitos vídeos'], correct: 1 },
       ]
     }
   },
-  {
-    id: 'c5',
-    title: 'Inteligência Artificial',
-    subtitle: 'IA para o Mercado de Trabalho',
-    description: 'Utilize ferramentas de IA para acelerar sua produtividade, dominar prompt engineering, automatizar tarefas e se destacar no mercado de trabalho do futuro.',
-    coverColor: 'linear-gradient(135deg, #00d4ff 0%, #0066ff 100%)',
-    modules: [
-      {
-        id: 'm10',
-        title: 'Fundamentos de IA Generativa',
-        order: 1,
-        lessons: [
-          { id: 'l28', title: 'Como Funcionam os LLMs', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '20:00', order: 1 },
-          { id: 'l29', title: 'Prompt Engineering Avançado', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '35:00', order: 2 },
-          { id: 'l30', title: 'ChatGPT, Claude e Gemini na Prática', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '28:00', order: 3 },
-        ],
-        quiz: {
-          id: 'q10',
-          title: 'Quiz — IA Generativa',
-          questions: [
-            { id: 'qq18', question: 'O que é um LLM?', options: ['Large Language Model', 'Low Level Machine', 'Linear Learning Module', 'Logic Language Method'], correct: 0 },
-            { id: 'qq19', question: 'O que é prompt engineering?', options: ['Programar em Python', 'Arte de criar instruções eficazes para IAs', 'Treinar modelos de IA', 'Instalar ferramentas de IA'], correct: 1 },
-          ]
-        }
-      },
-      {
-        id: 'm11',
-        title: 'IA Aplicada no Trabalho',
-        order: 2,
-        lessons: [
-          { id: 'l31', title: 'Automação com IA (Zapier, Make)', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '32:00', order: 1 },
-          { id: 'l32', title: 'IA para Criação de Conteúdo', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '30:00', order: 2 },
-          { id: 'l33', title: 'IA para Análise de Dados', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '35:00', order: 3 },
-        ],
-        quiz: {
-          id: 'q11',
-          title: 'Quiz — IA Aplicada',
-          questions: [
-            { id: 'qq20', question: 'O que é automação com IA?', options: ['Usar robôs físicos', 'Configurar fluxos que executam tarefas automaticamente', 'Programar em Python', 'Usar planilhas'], correct: 1 },
-          ]
-        }
-      }
-    ],
-    finalExam: {
-      id: 'fe5',
-      title: 'Prova Final — Inteligência Artificial',
-      questions: [
-        { id: 'fq13', question: 'Qual ferramenta de IA é mais indicada para textos?', options: ['Stable Diffusion', 'Midjourney', 'ChatGPT/Claude', 'DALL-E'], correct: 2 },
-        { id: 'fq14', question: 'O que é RAG em IA?', options: ['Retrieval-Augmented Generation', 'Random Automated Generation', 'Real AI Generator', 'Retrieval Algorithm Generator'], correct: 0 },
-        { id: 'fq15', question: 'Qual é o principal benefício do prompt engineering?', options: ['Programar sem código', 'Obter melhores respostas das IAs', 'Criar imagens', 'Treinar modelos'], correct: 1 },
-      ]
-    }
-  }
 ];
 
-// Initial progress — student has started course 1
-export const initialProgress = [
-  {
-    alunoId: 'student1',
-    cursoId: 'c1',
-    status: 'andamento',
-    aulasAssistidas: ['l1', 'l2'],
-    modulosCompletos: [],
-    avaliacoesFeitas: [],
-    avaliacaoFinal: null,
-    dataInicio: '2025-01-15',
-    dataFim: null
-  }
-];
+// Initial progress — empty (no pre-loaded progress)
+export const initialProgress = [];
