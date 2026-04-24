@@ -1,4 +1,87 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
+
+// Malha neural animada para o banner do curso
+function BannerMesh({ accentColor = '#00d4ff' }) {
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let animId;
+    let t = 0;
+    const NUM = 70;
+    const MAX_D = 110;
+
+    const W = canvas.offsetWidth || 640;
+    const H = canvas.offsetHeight || 180;
+    canvas.width = W;
+    canvas.height = H;
+
+    const pts = Array.from({ length: NUM }, () => ({
+      x: Math.random() * W, y: Math.random() * H,
+      bx: 0, by: 0,
+      vx: (Math.random() - 0.5) * 0.4,
+      vy: (Math.random() - 0.5) * 0.4,
+      phase: Math.random() * Math.PI * 2,
+      amp: Math.random() * 12 + 4,
+      r: Math.random() * 1.4 + 0.5,
+    }));
+    pts.forEach(p => { p.bx = p.x; p.by = p.y; });
+
+    const draw = () => {
+      ctx.clearRect(0, 0, W, H);
+      t += 0.006;
+
+      pts.forEach(p => {
+        p.bx += p.vx; p.by += p.vy;
+        if (p.bx < 0 || p.bx > W) p.vx *= -1;
+        if (p.by < 0 || p.by > H) p.vy *= -1;
+        p.x = p.bx + Math.sin(t + p.phase) * p.amp * 0.5;
+        p.y = p.by + Math.cos(t * 0.8 + p.phase) * p.amp;
+      });
+
+      for (let i = 0; i < pts.length; i++) {
+        for (let j = i + 1; j < pts.length; j++) {
+          const dx = pts[i].x - pts[j].x, dy = pts[i].y - pts[j].y;
+          const d = Math.sqrt(dx * dx + dy * dy);
+          if (d < MAX_D) {
+            ctx.beginPath();
+            ctx.strokeStyle = `rgba(0,212,255,${(1 - d / MAX_D) * 0.18})`;
+            ctx.lineWidth = 0.6;
+            ctx.moveTo(pts[i].x, pts[i].y);
+            ctx.lineTo(pts[j].x, pts[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+
+      pts.forEach(p => {
+        const pulse = 0.4 + Math.sin(t * 1.8 + p.phase) * 0.25;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r * 2.5, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(0,212,255,0.05)`;
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(0,212,255,${pulse})`;
+        ctx.fill();
+      });
+
+      animId = requestAnimationFrame(draw);
+    };
+
+    draw();
+    return () => cancelAnimationFrame(animId);
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', zIndex: 1 }}
+    />
+  );
+}
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useData } from '../../contexts/DataContext';
@@ -76,45 +159,41 @@ export function CursoView() {
 
       {/* Course Hero Banner */}
       <div style={{
-        height: '180px',
+        height: '200px',
         background: curso.coverColor,
         position: 'relative',
         overflow: 'hidden'
       }}>
-        {/* Grid pattern */}
+        {/* Neural mesh animation */}
+        <BannerMesh accentColor={curso.accentColor} />
+
+        {/* Bottom gradient + text — acima do canvas */}
         <div style={{
           position: 'absolute', inset: 0,
-          backgroundImage: `
-            linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)
-          `,
-          backgroundSize: '32px 32px'
-        }} />
-        <div style={{
-          position: 'absolute', inset: 0,
-          background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 100%)',
+          background: 'linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.25) 60%, rgba(0,0,0,0.05) 100%)',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'flex-end',
-          padding: '24px'
+          padding: '24px',
+          zIndex: 2,
         }}>
           <p style={{
-            fontSize: '0.75rem',
+            fontSize: '0.72rem',
             fontWeight: '500',
-            color: 'rgba(255,255,255,0.65)',
+            color: curso.accentColor ? `${curso.accentColor}cc` : 'rgba(255,255,255,0.6)',
             textTransform: 'uppercase',
-            letterSpacing: '1.5px',
+            letterSpacing: '2px',
             fontFamily: 'var(--font-body)',
-            marginBottom: '4px'
+            marginBottom: '6px'
           }}>
             {curso.subtitle}
           </p>
           <h1 style={{
             fontFamily: 'var(--font-display)',
-            fontSize: '1.5rem',
+            fontSize: '1.6rem',
             fontWeight: '700',
             color: 'white',
-            textShadow: '0 2px 8px rgba(0,0,0,0.5)'
+            textShadow: '0 2px 12px rgba(0,0,0,0.7)'
           }}>
             {curso.title}
           </h1>
@@ -269,13 +348,15 @@ export function CursoView() {
                           }}>
                             {lesson.title}
                           </div>
-                          <div style={{
-                            fontSize: '0.72rem',
-                            color: 'rgba(255,255,255,0.35)',
-                            fontFamily: 'var(--font-body)'
-                          }}>
-                            {lesson.duration}
-                          </div>
+                          {lesson.duration && (
+                            <div style={{
+                              fontSize: '0.72rem',
+                              color: 'rgba(255,255,255,0.35)',
+                              fontFamily: 'var(--font-body)'
+                            }}>
+                              {lesson.duration}
+                            </div>
+                          )}
                         </div>
                       </div>
                     );

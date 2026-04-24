@@ -2,6 +2,91 @@ import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useData } from '../contexts/DataContext';
 
+// ── Partículas da Navbar ────────────────────────────────────────────────────
+function NavParticles() {
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let animId;
+    let t = 0;
+
+    const resize = () => {
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+    };
+    resize();
+
+    const NUM = 42;
+    const pts = Array.from({ length: NUM }, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      vx: (Math.random() - 0.5) * 0.28,
+      vy: (Math.random() - 0.5) * 0.28,
+      r: Math.random() * 1.3 + 0.4,
+      isBlue: Math.random() > 0.45,
+      baseOpacity: Math.random() * 0.28 + 0.12,
+      phase: Math.random() * Math.PI * 2,
+    }));
+
+    const draw = () => {
+      const W = canvas.width;
+      const H = canvas.height;
+      ctx.clearRect(0, 0, W, H);
+      t += 0.008;
+
+      pts.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.x < 0) p.x = W;
+        if (p.x > W) p.x = 0;
+        if (p.y < 0) p.y = H;
+        if (p.y > H) p.y = 0;
+
+        const alpha = p.baseOpacity + Math.sin(t * 1.2 + p.phase) * 0.1;
+        const color = p.isBlue ? '0,212,255' : '200,220,255';
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r * 2.5, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${color},${alpha * 0.18})`;
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${color},${alpha})`;
+        ctx.fill();
+      });
+
+      animId = requestAnimationFrame(draw);
+    };
+
+    draw();
+    const onResize = () => resize();
+    window.addEventListener('resize', onResize);
+    return () => {
+      cancelAnimationFrame(animId);
+      window.removeEventListener('resize', onResize);
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      style={{
+        position: 'absolute',
+        inset: 0,
+        width: '100%',
+        height: '100%',
+        filter: 'blur(0.7px)',
+        pointerEvents: 'none',
+        zIndex: 0,
+      }}
+    />
+  );
+}
+
 // ── Neural Mesh Canvas ──────────────────────────────────────────────────────
 function NeuralMesh() {
   const canvasRef = useRef(null);
@@ -114,14 +199,14 @@ function NeuralMesh() {
 
 // ── Course Icons ────────────────────────────────────────────────────────────
 const ICONS = {
-  c1: ( // Canva — pen tool / design
+  c1: (
     <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
       <path d="M20 4l8 8-14 14H6v-8L20 4z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
       <path d="M17 7l8 8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
       <path d="M4 28l4-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
     </svg>
   ),
-  c2: ( // Pensamento Computacional — circuit / cpu
+  c2: (
     <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
       <rect x="9" y="9" width="14" height="14" rx="2" stroke="currentColor" strokeWidth="1.8" />
       <path d="M12 9V6M16 9V6M20 9V6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
@@ -131,7 +216,7 @@ const ICONS = {
       <rect x="13" y="13" width="6" height="6" rx="1" fill="currentColor" opacity="0.5" />
     </svg>
   ),
-  c3: ( // Guia Offline — compass / map
+  c3: (
     <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
       <circle cx="16" cy="16" r="12" stroke="currentColor" strokeWidth="1.8" />
       <circle cx="16" cy="16" r="2" fill="currentColor" />
@@ -139,7 +224,7 @@ const ICONS = {
       <path d="M19 13l-6 3 3 3 6-3-3-3z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" />
     </svg>
   ),
-  c4: ( // Design Instrucional — layers / book
+  c4: (
     <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
       <path d="M6 22l10 5 10-5" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
       <path d="M6 16l10 5 10-5" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
@@ -148,9 +233,88 @@ const ICONS = {
   ),
 };
 
-// ── Course Card ─────────────────────────────────────────────────────────────
-function CourseCard({ course, onClick }) {
+// ── Card especial: Pensamento Computacional (sci-fi) ────────────────────────
+function ScifiCourseCard({ course, onClick }) {
   const [hovered, setHovered] = useState(false);
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let animId;
+    let t = 0;
+
+    const W = canvas.width = 260;
+    const H = canvas.height = 380;
+
+    // Mini neural mesh confined to card
+    const pts = Array.from({ length: 55 }, () => ({
+      x: Math.random() * W, y: Math.random() * H,
+      bx: 0, by: 0,
+      vx: (Math.random() - 0.5) * 0.5,
+      vy: (Math.random() - 0.5) * 0.5,
+      phase: Math.random() * Math.PI * 2,
+      r: Math.random() * 1.5 + 0.5,
+    }));
+    pts.forEach(p => { p.bx = p.x; p.by = p.y; });
+
+    const draw = () => {
+      ctx.clearRect(0, 0, W, H);
+      t += 0.007;
+
+      pts.forEach(p => {
+        p.bx += p.vx; p.by += p.vy;
+        if (p.bx < 0 || p.bx > W) p.vx *= -1;
+        if (p.by < 0 || p.by > H) p.vy *= -1;
+        p.x = p.bx + Math.sin(t + p.phase) * 8;
+        p.y = p.by + Math.cos(t * 0.8 + p.phase) * 10;
+      });
+
+      // lines
+      for (let i = 0; i < pts.length; i++) {
+        for (let j = i + 1; j < pts.length; j++) {
+          const dx = pts[i].x - pts[j].x, dy = pts[i].y - pts[j].y;
+          const d = Math.sqrt(dx * dx + dy * dy);
+          if (d < 80) {
+            ctx.beginPath();
+            ctx.strokeStyle = `rgba(0,212,255,${(1 - d / 80) * 0.25})`;
+            ctx.lineWidth = 0.5;
+            ctx.moveTo(pts[i].x, pts[i].y);
+            ctx.lineTo(pts[j].x, pts[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+
+      // dots
+      pts.forEach(p => {
+        const pulse = 0.5 + Math.sin(t * 2 + p.phase) * 0.3;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r * 2, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(0,136,255,0.06)`;
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(0,212,255,${pulse})`;
+        ctx.fill();
+      });
+
+      // horizontal scan line
+      const scanY = ((t * 40) % (H + 40)) - 20;
+      const grad = ctx.createLinearGradient(0, scanY - 12, 0, scanY + 12);
+      grad.addColorStop(0, 'transparent');
+      grad.addColorStop(0.5, 'rgba(0,212,255,0.06)');
+      grad.addColorStop(1, 'transparent');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, scanY - 12, W, 24);
+
+      animId = requestAnimationFrame(draw);
+    };
+
+    draw();
+    return () => cancelAnimationFrame(animId);
+  }, []);
 
   return (
     <div
@@ -165,13 +329,175 @@ function CourseCard({ course, onClick }) {
         overflow: 'hidden',
         cursor: 'pointer',
         position: 'relative',
-        background: course.coverColor,
-        border: `1px solid ${hovered ? `${course.accentColor}55` : 'rgba(255,255,255,0.06)'}`,
-        transform: hovered ? 'scale(1.04) translateY(-6px)' : 'scale(1) translateY(0)',
+        background: '#010a14',
+        border: `1px solid ${hovered ? 'rgba(0,212,255,0.7)' : 'rgba(0,212,255,0.35)'}`,
+        transform: hovered ? 'scale(1.05) translateY(-8px)' : 'scale(1) translateY(0)',
         boxShadow: hovered
-          ? `0 24px 60px rgba(0,0,0,0.6), 0 0 40px ${course.accentColor}33`
-          : '0 8px 32px rgba(0,0,0,0.5)',
+          ? '0 28px 70px rgba(0,0,0,0.7), 0 0 60px rgba(0,136,255,0.35), 0 0 120px rgba(0,212,255,0.12)'
+          : '0 8px 40px rgba(0,0,0,0.6), 0 0 30px rgba(0,136,255,0.15)',
         transition: 'all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)',
+      }}
+    >
+      {/* Animated neural mesh background */}
+      <canvas
+        ref={canvasRef}
+        width={260}
+        height={380}
+        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}
+      />
+
+      {/* Corner brackets sci-fi */}
+      {[
+        { top: 8, left: 8 },
+        { top: 8, right: 8 },
+        { bottom: 8, left: 8 },
+        { bottom: 8, right: 8 },
+      ].map((pos, i) => (
+        <svg
+          key={i}
+          width="14" height="14" viewBox="0 0 14 14" fill="none"
+          style={{ position: 'absolute', ...pos, opacity: hovered ? 0.9 : 0.5, transition: 'opacity 0.3s ease' }}
+        >
+          {i === 0 && <><path d="M0 8V0h8" stroke="#00d4ff" strokeWidth="1.5" /></>}
+          {i === 1 && <><path d="M14 8V0H6" stroke="#00d4ff" strokeWidth="1.5" /></>}
+          {i === 2 && <><path d="M0 6v8h8" stroke="#00d4ff" strokeWidth="1.5" /></>}
+          {i === 3 && <><path d="M14 6v8H6" stroke="#00d4ff" strokeWidth="1.5" /></>}
+        </svg>
+      ))}
+
+      {/* Top glow line */}
+      <div style={{
+        position: 'absolute', top: 0, left: 0, right: 0, height: '1px',
+        background: 'linear-gradient(90deg, transparent, #00d4ff, transparent)',
+        opacity: hovered ? 1 : 0.6,
+        transition: 'opacity 0.3s ease',
+        boxShadow: '0 0 8px #00d4ff',
+      }} />
+
+      {/* Dark gradient overlay bottom */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        background: 'linear-gradient(to top, rgba(0,4,12,0.92) 0%, rgba(0,4,12,0.5) 45%, transparent 100%)',
+      }} />
+
+      {/* Content */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        padding: '22px',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+      }}>
+        {/* Top: icon + "DISPONÍVEL" badge */}
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+          <div style={{
+            width: '52px', height: '52px',
+            borderRadius: '10px',
+            background: 'rgba(0,20,40,0.8)',
+            backdropFilter: 'blur(8px)',
+            border: '1px solid rgba(0,212,255,0.4)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: '#00d4ff',
+            boxShadow: hovered ? '0 0 20px rgba(0,212,255,0.4)' : '0 0 10px rgba(0,212,255,0.2)',
+            transition: 'box-shadow 0.3s ease',
+          }}>
+            {ICONS['c2']}
+          </div>
+          <div style={{
+            padding: '4px 10px',
+            borderRadius: '4px',
+            background: 'rgba(0,212,255,0.12)',
+            border: '1px solid rgba(0,212,255,0.35)',
+            fontSize: '0.6rem',
+            fontWeight: '700',
+            color: '#00d4ff',
+            letterSpacing: '2px',
+            textTransform: 'uppercase',
+            fontFamily: 'var(--font-body)',
+            boxShadow: '0 0 10px rgba(0,212,255,0.2)',
+          }}>
+            DISPONÍVEL
+          </div>
+        </div>
+
+        {/* Bottom info */}
+        <div>
+          {/* Subtitle */}
+          <p style={{
+            fontSize: '0.65rem',
+            fontWeight: '600',
+            color: 'rgba(0,212,255,0.7)',
+            textTransform: 'uppercase',
+            letterSpacing: '2px',
+            fontFamily: 'var(--font-body)',
+            marginBottom: '6px',
+          }}>
+            {course.subtitle}
+          </p>
+
+          {/* Title */}
+          <h3 style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: '1.25rem',
+            fontWeight: '700',
+            color: '#ffffff',
+            lineHeight: '1.2',
+            marginBottom: '16px',
+            textShadow: hovered ? '0 0 20px rgba(0,212,255,0.4)' : 'none',
+            transition: 'text-shadow 0.3s ease',
+          }}>
+            {course.title}
+          </h3>
+
+          {/* CTA */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '6px',
+            padding: '11px 0',
+            borderRadius: '8px',
+            background: hovered ? 'rgba(0,212,255,0.18)' : 'rgba(0,212,255,0.1)',
+            border: `1px solid ${hovered ? 'rgba(0,212,255,0.7)' : 'rgba(0,212,255,0.35)'}`,
+            color: '#00d4ff',
+            fontFamily: 'var(--font-body)',
+            fontWeight: '600',
+            fontSize: '0.85rem',
+            transition: 'all 0.25s ease',
+            boxShadow: hovered ? '0 0 16px rgba(0,212,255,0.25)' : 'none',
+          }}>
+            Acessar curso
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+              <path d="M2.5 6.5h8M8 3.5l3 3-3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Course Card (padrão — em construção) ────────────────────────────────────
+function CourseCard({ course, onClick }) {
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        flexShrink: 0,
+        width: '260px',
+        height: '380px',
+        borderRadius: '14px',
+        overflow: 'hidden',
+        cursor: 'default',
+        position: 'relative',
+        background: course.coverColor,
+        border: '1px solid rgba(255,255,255,0.05)',
+        opacity: 0.45,
+        filter: 'grayscale(40%)',
+        transition: 'all 0.3s ease',
       }}
     >
       {/* Grid overlay */}
@@ -182,25 +508,42 @@ function CourseCard({ course, onClick }) {
           linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)
         `,
         backgroundSize: '24px 24px',
-        opacity: hovered ? 1 : 0.5,
-        transition: 'opacity 0.3s ease',
+        opacity: 0.4,
       }} />
 
-      {/* Bottom gradient fade */}
+      {/* Bottom gradient */}
       <div style={{
         position: 'absolute', inset: 0,
-        background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.1) 50%, transparent 100%)',
+        background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 50%, transparent 100%)',
       }} />
 
-      {/* Accent glow at top */}
+      {/* "Em construção" badge — centro */}
       <div style={{
         position: 'absolute',
-        top: 0, left: 0, right: 0,
-        height: '1px',
-        background: `linear-gradient(90deg, transparent, ${course.accentColor}88, transparent)`,
-        opacity: hovered ? 1 : 0.4,
-        transition: 'opacity 0.3s ease',
-      }} />
+        top: '50%', left: '50%',
+        transform: 'translate(-50%, -50%)',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '8px',
+        zIndex: 2,
+      }}>
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <path d="M14 3l2.5 7.5H24l-6 4.5 2.5 7.5L14 18l-6.5 4.5 2.5-7.5L4 10.5h7.5L14 3z"
+            stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" strokeLinejoin="round" />
+        </svg>
+        <span style={{
+          fontFamily: 'var(--font-body)',
+          fontSize: '0.65rem',
+          fontWeight: '600',
+          color: 'rgba(255,255,255,0.4)',
+          textTransform: 'uppercase',
+          letterSpacing: '2.5px',
+          textAlign: 'center',
+        }}>
+          Em construção
+        </span>
+      </div>
 
       {/* Content */}
       <div style={{
@@ -216,14 +559,11 @@ function CourseCard({ course, onClick }) {
           borderRadius: '12px',
           background: 'rgba(0,0,0,0.4)',
           backdropFilter: 'blur(8px)',
-          border: `1px solid ${course.accentColor}44`,
+          border: `1px solid ${course.accentColor}22`,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: course.accentColor,
-          transform: hovered ? 'scale(1.08)' : 'scale(1)',
-          transition: 'transform 0.3s ease',
-          boxShadow: hovered ? `0 0 16px ${course.accentColor}44` : 'none',
+          color: `${course.accentColor}66`,
         }}>
           {ICONS[course.id]}
         </div>
@@ -233,7 +573,7 @@ function CourseCard({ course, onClick }) {
           <p style={{
             fontSize: '0.7rem',
             fontWeight: '500',
-            color: `${course.accentColor}cc`,
+            color: `${course.accentColor}66`,
             textTransform: 'uppercase',
             letterSpacing: '1.5px',
             fontFamily: 'var(--font-body)',
@@ -330,37 +670,30 @@ export function Home() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '16px 40px',
-        background: 'rgba(0,0,0,0.75)',
+        padding: '12px 40px',
+        background: 'rgba(0,0,0,0.72)',
         backdropFilter: 'blur(16px)',
         borderBottom: '1px solid rgba(0,212,255,0.08)',
         position: 'fixed',
         top: 0, left: 0, right: 0,
         zIndex: 200,
+        overflow: 'hidden',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <svg width="26" height="26" viewBox="0 0 28 28" fill="none">
-            <circle cx="14" cy="14" r="13" stroke="#00d4ff" strokeWidth="1.5" opacity="0.6" />
-            <circle cx="14" cy="14" r="5" fill="#00d4ff" />
-            <line x1="14" y1="1" x2="14" y2="6" stroke="#00d4ff" strokeWidth="1.5" strokeLinecap="round" />
-            <line x1="14" y1="22" x2="14" y2="27" stroke="#00d4ff" strokeWidth="1.5" strokeLinecap="round" />
-            <line x1="1" y1="14" x2="6" y2="14" stroke="#00d4ff" strokeWidth="1.5" strokeLinecap="round" />
-            <line x1="22" y1="14" x2="27" y2="14" stroke="#00d4ff" strokeWidth="1.5" strokeLinecap="round" />
-          </svg>
-          <span style={{
-            fontFamily: 'var(--font-logo)',
-            fontSize: '1rem',
-            fontWeight: '700',
-            color: '#ffffff',
-            letterSpacing: '0.5px',
-          }}>
-            GetFuture<span style={{ color: '#00d4ff', textShadow: '0 0 10px rgba(0,212,255,0.6)' }}>Today</span>
-          </span>
+        <NavParticles />
+
+        <div style={{ lineHeight: 0, position: 'relative', zIndex: 1 }}>
+          <img
+            src="/getfacil/logo-getfuturetoday.png"
+            alt="GetFutureToday"
+            style={{ height: '40px', width: 'auto', display: 'block' }}
+          />
         </div>
 
         <button
           onClick={scrollToCourses}
           style={{
+            position: 'relative',
+            zIndex: 1,
             fontFamily: 'var(--font-body)',
             fontSize: '0.875rem',
             fontWeight: '500',
@@ -627,13 +960,20 @@ export function Home() {
               userSelect: 'none',
             }}
           >
-            {cursos.map(course => (
-              <CourseCard
-                key={course.id}
-                course={course}
-                onClick={() => !isDragging && navigate(`/curso/${course.id}`)}
-              />
-            ))}
+            {cursos.map(course =>
+              course.id === 'c2' ? (
+                <ScifiCourseCard
+                  key={course.id}
+                  course={course}
+                  onClick={() => !isDragging && navigate(`/curso/${course.id}`)}
+                />
+              ) : (
+                <CourseCard
+                  key={course.id}
+                  course={course}
+                />
+              )
+            )}
           </div>
         </div>
 

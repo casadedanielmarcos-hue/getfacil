@@ -68,56 +68,35 @@ export const courses = [
     description: 'Desenvolva o raciocínio lógico e estruturado para resolver problemas complexos. Aprenda decomposição, padrões, abstração e algoritmos na prática.',
     coverColor: 'linear-gradient(135deg, #0a0a0f 0%, #0088ff 100%)',
     accentColor: '#0088ff',
+    slug: 'pensamento-computacional',
     modules: [
       {
-        id: 'm3',
-        title: 'Os 4 Pilares do Pensamento Computacional',
-        order: 1,
+        id: 'm1',
+        title: 'Módulo 1 - Fundamentos',
         lessons: [
-          { id: 'l7', title: 'Decomposição de Problemas', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '20:00', order: 1 },
-          { id: 'l8', title: 'Reconhecimento de Padrões', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '22:00', order: 2 },
-          { id: 'l9', title: 'Abstração e Algoritmos', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '25:00', order: 3 },
+          { id: 'introducao',  title: 'Introdução',                                          slug: 'Introdução', type: 'rise360' },
+          { id: 'capitulo-1', title: 'Capítulo 1: O Método para Decifrar o Futuro',          slug: 'Cap 1',      type: 'rise360' },
+          { id: 'desafio-1',  title: 'Desafio 1: Duas Lentes para a Sua Prática',            slug: 'Des 1',      type: 'rise360' },
         ],
-        quiz: {
-          id: 'q3',
-          title: 'Quiz — Os 4 Pilares',
-          questions: [
-            { id: 'qq6', question: 'O que é decomposição no pensamento computacional?', options: ['Programar em partes', 'Dividir um problema complexo em partes menores', 'Usar matemática avançada', 'Criar algoritmos'], correct: 1 },
-            { id: 'qq7', question: 'O que é abstração?', options: ['Ignorar detalhes irrelevantes para focar no essencial', 'Criar imagens mentais', 'Escrever código abstraído', 'Usar pseudocódigo'], correct: 0 },
-            { id: 'qq8', question: 'O que é um algoritmo?', options: ['Um tipo de programa', 'Uma sequência lógica de passos para resolver um problema', 'Uma linguagem de programação', 'Um diagrama de fluxo'], correct: 1 },
-          ]
-        }
       },
       {
-        id: 'm4',
-        title: 'Algoritmos na Prática',
-        order: 2,
+        id: 'm2',
+        title: 'Módulo 2 - Aprofundamento',
         lessons: [
-          { id: 'l10', title: 'Fluxogramas e Pseudocódigo', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '28:00', order: 1 },
-          { id: 'l11', title: 'Estruturas de Decisão', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '30:00', order: 2 },
-          { id: 'l12', title: 'Repetição e Loops', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', duration: '25:00', order: 3 },
+          { id: 'capitulo-2', title: 'Capítulo 2: Conectando Saberes',                       slug: 'Cap 2',      type: 'rise360' },
+          { id: 'desafio-2',  title: 'Desafio 2',                                            slug: 'Des 2',      type: 'rise360' },
         ],
-        quiz: {
-          id: 'q4',
-          title: 'Quiz — Algoritmos',
-          questions: [
-            { id: 'qq9', question: 'Para que serve um fluxograma?', options: ['Escrever código', 'Representar visualmente o fluxo de um algoritmo', 'Fazer cálculos', 'Criar bancos de dados'], correct: 1 },
-            { id: 'qq10', question: 'O que é uma estrutura de repetição?', options: ['Um tipo de variável', 'Um bloco que executa instruções múltiplas vezes', 'Uma condição lógica', 'Um método de ordenação'], correct: 1 },
-          ]
-        }
+      },
+      {
+        id: 'm3',
+        title: 'Módulo 3 - Avançado',
+        lessons: [
+          { id: 'capitulo-3', title: 'Capítulo 3: O Método para o Novo Mundo Digital',       slug: 'Cap 3',      type: 'rise360' },
+          { id: 'desafio-3',  title: 'Desafio 3',                                            slug: 'Des 3',      type: 'rise360' },
+          { id: 'materiais',  title: 'Materiais Complementares',                              slug: 'materiais',  type: 'rise360' },
+        ],
       },
     ],
-    finalExam: {
-      id: 'fe2',
-      title: 'Prova Final — Pensamento Computacional',
-      questions: [
-        { id: 'fq6', question: 'Quais são os 4 pilares do pensamento computacional?', options: ['Código, dados, redes, segurança', 'Decomposição, padrões, abstração, algoritmos', 'Lógica, matemática, física, química', 'Input, processo, output, feedback'], correct: 1 },
-        { id: 'fq7', question: 'Reconhecimento de padrões ajuda a:', options: ['Criar programas mais rápidos', 'Identificar semelhanças para aplicar soluções já conhecidas', 'Simplificar o código', 'Reduzir memória usada'], correct: 1 },
-        { id: 'fq8', question: 'Um algoritmo deve ser:', options: ['Complexo e detalhado', 'Finito, preciso e com início e fim definidos', 'Escrito em inglês', 'Apenas visual'], correct: 1 },
-        { id: 'fq9', question: 'O que é pseudocódigo?', options: ['Código com erros', 'Uma descrição textual de algoritmo próxima da linguagem natural', 'Um diagrama de fluxo', 'Código compilado'], correct: 1 },
-        { id: 'fq10', question: 'Qual é o benefício de decompor um problema?', options: ['Torna o problema mais difícil', 'Facilita a resolução ao dividir em partes gerenciáveis', 'Elimina a necessidade de algoritmos', 'Reduz a necessidade de testes'], correct: 1 },
-      ]
-    }
   },
   {
     id: 'c3',

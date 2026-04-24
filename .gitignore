@@ -27,3 +27,10 @@ yarn-error.log*
 # OS files
 .DS_Store
 Thumbs.db
+
+# Large media assets — Rise 360 videos exceeds GitHub 100MB limit
+*.mp4
+*.mov
+*.avi
+*.mkv
+public/Cursos/**/assets/
