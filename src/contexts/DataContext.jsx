@@ -1,138 +1,185 @@
-import { createContext, useContext, useState } from 'react';
-import { courses, initialProgress, STUDENT_ID } from '../data/courses';
+import { createContext, useContext, useState, useEffect, useRef } from 'react';
+import { doc, updateDoc, arrayUnion } from 'firebase/firestore';
+import { db } from '../firebase';
+import { useAuth } from './AuthContext';
+import { courses } from '../data/courses';
 
 const DataContext = createContext(null);
 
+function firestoreToLocal(uid, progrMap) {
+  return Object.entries(progrMap || {}).map(([cursoId, p]) => ({
+    alunoId: uid,
+    cursoId,
+    status: p.status || 'andamento',
+    aulasAssistidas: p.aulasAssistidas || [],
+    modulosCompletos: p.modulosCompletos || [],
+    avaliacoesFeitas: p.avaliacoesFeitas || [],
+    avaliacaoFinal: p.avaliacaoFinal || null,
+    resultado: p.resultado || null,
+    dataInicio: p.dataInicio || new Date().toISOString().split('T')[0],
+    dataFim: p.dataFim || null,
+  }));
+}
+
+function localToFirestore(uid, progressoArray) {
+  const map = {};
+  progressoArray
+    .filter(p => p.alunoId === uid)
+    .forEach(({ alunoId, cursoId, ...rest }) => { map[cursoId] = rest; });
+  return map;
+}
+
 export function DataProvider({ children }) {
-  const [cursos] = useState(courses);
-  const [progresso, setProgresso] = useState(initialProgress);
+  const { user, addCursoMatriculado, updateProgresso } = useAuth();
+  const [progresso, setProgresso] = useState([]);
+  const pendingSave = useRef(null);
 
-  const ALUNO_ID = STUDENT_ID;
+  useEffect(() => {
+    if (user) {
+      setProgresso(firestoreToLocal(user.id, user.progresso));
+    } else {
+      setProgresso([]);
+    }
+  }, [user?.id]);
 
-  const calcularProgresso = (cursoId, alunoId) => {
-    const curso = cursos.find(c => c.id === cursoId);
-    const prog = progresso.find(p => p.cursoId === cursoId && p.alunoId === alunoId);
-    if (!curso || !prog) return 0;
-    const totalAulas = curso.modules.reduce((acc, m) => acc + m.lessons.length, 0);
-    if (totalAulas === 0) return 0;
-    return Math.round((prog.aulasAssistidas.length / totalAulas) * 100);
+  const saveToFirestore = (userId, newProgresso) => {
+    if (!userId) return;
+    if (pendingSave.current) clearTimeout(pendingSave.current);
+    pendingSave.current = setTimeout(async () => {
+      try {
+        const map = localToFirestore(userId, newProgresso);
+        await updateDoc(doc(db, 'alunos', userId), { progresso: map });
+        Object.entries(map).forEach(([cursoId, p]) => updateProgresso(cursoId, p));
+      } catch (err) {
+        console.error('Erro ao salvar progresso:', err);
+      }
+    }, 500);
   };
 
-  // Auto-enroll student when they access a course
-  const ensureMatriculado = (alunoId, cursoId) => {
+  const calcularProgresso = (cursoId, alunoId) => {
+    const curso = courses.find(c => c.id === cursoId);
+    const prog = progresso.find(p => p.cursoId === cursoId && p.alunoId === alunoId);
+    if (!curso || !prog) return 0;
+    const total = curso.modules.reduce((acc, m) => acc + m.lessons.length, 0);
+    if (total === 0) return 0;
+    return Math.round((prog.aulasAssistidas.length / total) * 100);
+  };
+
+  const ensureMatriculado = async (alunoId, cursoId) => {
     const exists = progresso.some(p => p.alunoId === alunoId && p.cursoId === cursoId);
-    if (!exists) {
-      setProgresso(prev => [...prev, {
-        alunoId,
-        cursoId,
-        status: 'andamento',
-        aulasAssistidas: [],
-        modulosCompletos: [],
-        avaliacoesFeitas: [],
-        avaliacaoFinal: null,
-        dataInicio: new Date().toISOString().split('T')[0],
-        dataFim: null
-      }]);
+    if (exists) return;
+
+    const newEntry = {
+      alunoId, cursoId,
+      status: 'andamento',
+      aulasAssistidas: [], modulosCompletos: [],
+      avaliacoesFeitas: [], avaliacaoFinal: null,
+      resultado: null,
+      dataInicio: new Date().toISOString().split('T')[0],
+      dataFim: null,
+    };
+
+    setProgresso(prev => [...prev, newEntry]);
+
+    try {
+      await updateDoc(doc(db, 'alunos', alunoId), {
+        cursosMatriculados: arrayUnion(cursoId),
+        [`progresso.${cursoId}`]: {
+          status: 'andamento',
+          aulasAssistidas: [], modulosCompletos: [],
+          avaliacoesFeitas: [], avaliacaoFinal: null,
+          resultado: null,
+          dataInicio: new Date().toISOString().split('T')[0],
+          dataFim: null,
+        },
+      });
+      addCursoMatriculado(cursoId);
+    } catch (err) {
+      console.error('Erro ao matricular:', err);
     }
   };
 
-  const getCursosEmAndamento = (alunoId) => {
-    return progresso
+  const getCursosEmAndamento = (alunoId) =>
+    progresso
       .filter(p => p.alunoId === alunoId && p.status === 'andamento')
       .map(p => {
-        const curso = cursos.find(c => c.id === p.cursoId);
-        if (!curso) return null;
-        return {
-          ...curso,
-          progresso: calcularProgresso(p.cursoId, alunoId),
-          status: p.status
-        };
+        const c = courses.find(c => c.id === p.cursoId);
+        return c ? { ...c, progresso: calcularProgresso(p.cursoId, alunoId), status: p.status } : null;
       })
       .filter(Boolean);
-  };
 
-  const getCursosFinalizados = (alunoId) => {
-    return progresso
+  const getCursosFinalizados = (alunoId) =>
+    progresso
       .filter(p => p.alunoId === alunoId && p.status === 'finalizado')
       .map(p => {
-        const curso = cursos.find(c => c.id === p.cursoId);
-        if (!curso) return null;
-        return {
-          ...curso,
-          progresso: 100,
-          status: p.status,
-          resultado: p.resultado
-        };
+        const c = courses.find(c => c.id === p.cursoId);
+        return c ? { ...c, progresso: 100, status: p.status, resultado: p.resultado } : null;
       })
       .filter(Boolean);
-  };
 
-  const getProgressoCurso = (alunoId, cursoId) => {
-    return progresso.find(p => p.alunoId === alunoId && p.cursoId === cursoId);
-  };
+  const getProgressoCurso = (alunoId, cursoId) =>
+    progresso.find(p => p.alunoId === alunoId && p.cursoId === cursoId);
 
   const marcarAulaAssistida = (alunoId, cursoId, aulaId) => {
-    setProgresso(prev => prev.map(p => {
-      if (p.alunoId === alunoId && p.cursoId === cursoId) {
-        if (!p.aulasAssistidas.includes(aulaId)) {
+    setProgresso(prev => {
+      const updated = prev.map(p => {
+        if (p.alunoId === alunoId && p.cursoId === cursoId && !p.aulasAssistidas.includes(aulaId)) {
           return { ...p, aulasAssistidas: [...p.aulasAssistidas, aulaId] };
         }
-      }
-      return p;
-    }));
+        return p;
+      });
+      saveToFirestore(alunoId, updated);
+      return updated;
+    });
   };
 
   const marcarModuloCompleto = (alunoId, cursoId, moduloId) => {
-    setProgresso(prev => prev.map(p => {
-      if (p.alunoId === alunoId && p.cursoId === cursoId) {
-        if (!p.modulosCompletos.includes(moduloId)) {
+    setProgresso(prev => {
+      const updated = prev.map(p => {
+        if (p.alunoId === alunoId && p.cursoId === cursoId && !p.modulosCompletos.includes(moduloId)) {
           return { ...p, modulosCompletos: [...p.modulosCompletos, moduloId] };
         }
-      }
-      return p;
-    }));
+        return p;
+      });
+      saveToFirestore(alunoId, updated);
+      return updated;
+    });
   };
 
   const salvarAvaliacao = (alunoId, cursoId, avaliacaoId, nota, respostas, isFinal = false) => {
-    setProgresso(prev => prev.map(p => {
-      if (p.alunoId === alunoId && p.cursoId === cursoId) {
+    setProgresso(prev => {
+      const updated = prev.map(p => {
+        if (p.alunoId !== alunoId || p.cursoId !== cursoId) return p;
         if (isFinal) {
-          const resultado = nota >= 6 ? 'aprovado' : 'reprovado';
           return {
             ...p,
             avaliacaoFinal: { nota, tentativa: 1, respostas },
             status: 'finalizado',
-            resultado,
-            dataFim: new Date().toISOString().split('T')[0]
+            resultado: nota >= 6 ? 'aprovado' : 'reprovado',
+            dataFim: new Date().toISOString().split('T')[0],
           };
-        } else {
-          const existing = p.avaliacoesFeitas.find(a => a.avaliacaoId === avaliacaoId);
-          if (existing) {
-            return {
-              ...p,
-              avaliacoesFeitas: p.avaliacoesFeitas.map(a =>
+        }
+        const ex = p.avaliacoesFeitas.find(a => a.avaliacaoId === avaliacaoId);
+        return {
+          ...p,
+          avaliacoesFeitas: ex
+            ? p.avaliacoesFeitas.map(a =>
                 a.avaliacaoId === avaliacaoId
                   ? { ...a, nota, tentativa: a.tentativa + 1, respostas }
                   : a
               )
-            };
-          } else {
-            return {
-              ...p,
-              avaliacoesFeitas: [...p.avaliacoesFeitas, { avaliacaoId, nota, tentativa: 1, respostas }]
-            };
-          }
-        }
-      }
-      return p;
-    }));
+            : [...p.avaliacoesFeitas, { avaliacaoId, nota, tentativa: 1, respostas }],
+        };
+      });
+      saveToFirestore(alunoId, updated);
+      return updated;
+    });
   };
 
   return (
     <DataContext.Provider value={{
-      cursos,
+      cursos: courses,
       progresso,
-      ALUNO_ID,
       getCursosEmAndamento,
       getCursosFinalizados,
       getProgressoCurso,
@@ -140,7 +187,7 @@ export function DataProvider({ children }) {
       marcarModuloCompleto,
       salvarAvaliacao,
       calcularProgresso,
-      ensureMatriculado
+      ensureMatriculado,
     }}>
       {children}
     </DataContext.Provider>
@@ -148,7 +195,7 @@ export function DataProvider({ children }) {
 }
 
 export const useData = () => {
-  const context = useContext(DataContext);
-  if (!context) throw new Error('useData deve ser usado dentro de DataProvider');
-  return context;
+  const ctx = useContext(DataContext);
+  if (!ctx) throw new Error('useData deve ser usado dentro de DataProvider');
+  return ctx;
 };

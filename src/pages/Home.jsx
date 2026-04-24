@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useData } from '../contexts/DataContext';
+import { useAuth } from '../contexts/AuthContext';
 
 // ── Partículas da Navbar ────────────────────────────────────────────────────
 function NavParticles() {
@@ -627,8 +628,14 @@ const CARD_STEP = CARD_W + CARD_GAP;
 export function Home() {
   const navigate = useNavigate();
   const { cursos } = useData();
+  const { user, logout } = useAuth();
   const coursesRef = useRef(null);
   const trackRef = useRef(null);
+
+  // Filtra só cursos matriculados; se lista vazia mostra todos (admin/dev)
+  const cursosVisiveis = (user?.cursosMatriculados?.length > 0)
+    ? cursos.filter(c => user.cursosMatriculados.includes(c.id))
+    : [];
 
   const [offset, setOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -636,7 +643,7 @@ export function Home() {
 
   const getMaxOffset = () => {
     const containerW = trackRef.current?.parentElement?.offsetWidth || 320;
-    const totalW = cursos.length * CARD_STEP - CARD_GAP;
+    const totalW = cursosVisiveis.length * CARD_STEP - CARD_GAP;
     return Math.min(0, containerW - totalW - 48);
   };
 
@@ -689,27 +696,43 @@ export function Home() {
           />
         </div>
 
-        <button
-          onClick={scrollToCourses}
-          style={{
-            position: 'relative',
-            zIndex: 1,
-            fontFamily: 'var(--font-body)',
-            fontSize: '0.875rem',
-            fontWeight: '500',
-            color: 'rgba(255,255,255,0.6)',
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            padding: '8px 16px',
-            borderRadius: '8px',
-            transition: 'color 0.2s ease',
-          }}
-          onMouseEnter={e => { e.currentTarget.style.color = '#00d4ff'; }}
-          onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}
-        >
-          Cursos
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', position: 'relative', zIndex: 1 }}>
+          <button
+            onClick={scrollToCourses}
+            style={{
+              fontFamily: 'var(--font-body)', fontSize: '0.875rem', fontWeight: '500',
+              color: 'rgba(255,255,255,0.6)', background: 'none', border: 'none',
+              cursor: 'pointer', padding: '8px 16px', borderRadius: '8px', transition: 'color 0.2s ease',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.color = '#00d4ff'; }}
+            onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}
+          >
+            Cursos
+          </button>
+
+          {user && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <span style={{ fontFamily: 'var(--font-body)', fontSize: '0.8rem', color: 'rgba(255,255,255,0.4)' }}>
+                {user.nome?.split(' ')[0]}
+              </span>
+              <button
+                onClick={async () => { await logout(); navigate('/'); }}
+                style={{
+                  padding: '7px 14px', borderRadius: '7px',
+                  background: 'rgba(255,255,255,0.04)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  color: 'rgba(255,255,255,0.45)',
+                  fontFamily: 'var(--font-body)', fontSize: '0.78rem',
+                  cursor: 'pointer', transition: 'all 0.2s ease',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.color = '#ff4466'; e.currentTarget.style.borderColor = 'rgba(255,68,102,0.3)'; }}
+                onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.45)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; }}
+              >
+                Sair
+              </button>
+            </div>
+          )}
+        </div>
       </header>
 
       {/* ── Hero ───────────────────────────────────────────── */}
@@ -960,7 +983,17 @@ export function Home() {
               userSelect: 'none',
             }}
           >
-            {cursos.map(course =>
+            {cursosVisiveis.length === 0 ? (
+              <div style={{
+                padding: '48px 24px', color: 'rgba(255,255,255,0.3)',
+                fontFamily: 'var(--font-body)', fontSize: '0.9rem', lineHeight: '1.7',
+              }}>
+                Você ainda não está matriculado em nenhum curso.<br />
+                <span style={{ color: '#00d4ff', fontSize: '0.8rem' }}>
+                  Entre em contato com seu instrutor para ser matriculado.
+                </span>
+              </div>
+            ) : cursosVisiveis.map(course =>
               course.id === 'c2' ? (
                 <ScifiCourseCard
                   key={course.id}
@@ -968,9 +1001,10 @@ export function Home() {
                   onClick={() => !isDragging && navigate(`/curso/${course.id}`)}
                 />
               ) : (
-                <CourseCard
+                <ScifiCourseCard
                   key={course.id}
                   course={course}
+                  onClick={() => !isDragging && navigate(`/curso/${course.id}`)}
                 />
               )
             )}
@@ -979,7 +1013,7 @@ export function Home() {
 
         {/* Dot indicators */}
         <div style={{ display: 'flex', justifyContent: 'center', gap: '6px', marginTop: '20px' }}>
-          {cursos.map((_, i) => {
+          {cursosVisiveis.map((_, i) => {
             const pos = i * CARD_STEP;
             const active = -offset >= pos - CARD_STEP && -offset <= pos + CARD_STEP;
             return (
