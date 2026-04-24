@@ -99,26 +99,14 @@ export function AulaPlayer() {
 
         {/* Logo */}
         <div
-          style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', flexShrink: 0 }}
+          style={{ cursor: 'pointer', flexShrink: 0, lineHeight: 0 }}
           onClick={() => navigate('/')}
         >
-          <svg width="22" height="22" viewBox="0 0 28 28" fill="none">
-            <circle cx="14" cy="14" r="13" stroke="#00d4ff" strokeWidth="1.5" opacity="0.6" />
-            <circle cx="14" cy="14" r="5" fill="#00d4ff" />
-            <line x1="14" y1="1"  x2="14" y2="6"  stroke="#00d4ff" strokeWidth="1.5" strokeLinecap="round" />
-            <line x1="14" y1="22" x2="14" y2="27" stroke="#00d4ff" strokeWidth="1.5" strokeLinecap="round" />
-            <line x1="1"  y1="14" x2="6"  y2="14" stroke="#00d4ff" strokeWidth="1.5" strokeLinecap="round" />
-            <line x1="22" y1="14" x2="27" y2="14" stroke="#00d4ff" strokeWidth="1.5" strokeLinecap="round" />
-          </svg>
-          <span style={{
-            fontFamily: 'var(--font-logo)',
-            fontSize: '0.9rem',
-            fontWeight: '700',
-            color: '#ffffff',
-            letterSpacing: '0.3px',
-          }}>
-            GetFuture<span style={{ color: '#00d4ff', textShadow: '0 0 8px rgba(0,212,255,0.5)' }}>Today</span>
-          </span>
+          <img
+            src="/getfacil/logo-getfuturetoday.png"
+            alt="GetFutureToday"
+            style={{ height: '144px', width: 'auto', display: 'block' }}
+          />
         </div>
 
         {/* Center — título da aula */}
