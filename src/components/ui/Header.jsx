@@ -116,7 +116,7 @@ export function Header({ showBack = false, backTo = '/', backLabel = 'Voltar' })
         <img
           src="/getfacil/logo-getfuturetoday.png"
           alt="GetFutureToday"
-          style={{ height: '40px', width: 'auto', display: 'block' }}
+          style={{ height: '56px', width: 'auto', display: 'block' }}
         />
       </div>
 
