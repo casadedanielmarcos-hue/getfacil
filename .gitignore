@@ -1,8 +1,8 @@
 # Dependencies
 node_modules/
 
-# Build output
-dist/
+# Build output (só a pasta raiz dist/, não lib/dist dentro dos cursos)
+/dist/
 
 # Local env files
 .env
