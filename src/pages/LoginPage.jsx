@@ -144,8 +144,16 @@ export function LoginPage() {
 
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <img src="/getfacil/logo-getfuturetoday.png" alt="GetFutureToday"
-            style={{ height: '56px', width: 'auto', margin: '0 auto 14px', display: 'block' }} />
+          <div style={{ height: '90px', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '14px' }}>
+            <img
+              src="/getfacil/logo-getfuturetoday.png"
+              alt="GetFutureToday"
+              style={{
+                height: '360px', width: 'auto', display: 'block', flexShrink: 0,
+                filter: 'drop-shadow(0 0 14px rgba(0,212,255,0.65)) drop-shadow(0 0 32px rgba(0,212,255,0.3))',
+              }}
+            />
+          </div>
           <p style={{ fontFamily: 'var(--font-body)', fontSize: '0.82rem', color: 'rgba(255,255,255,0.35)' }}>
             {mode === 'login' ? 'Acesse sua conta' : 'Crie sua conta'}
           </p>
