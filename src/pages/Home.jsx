@@ -931,13 +931,25 @@ export function Home() {
             onClick={scrollToCourses}
             style={{
               fontFamily: 'var(--font-body)', fontSize: '0.875rem', fontWeight: '500',
-              color: 'rgba(255,255,255,0.6)', background: 'none', border: 'none',
-              cursor: 'pointer', padding: '8px 16px', borderRadius: '8px', transition: 'color 0.2s ease',
+              color: 'rgba(255,255,255,0.6)', background: 'none', border: '1px solid transparent',
+              cursor: 'pointer', padding: '7px 14px', borderRadius: '8px', transition: 'color 0.2s ease',
             }}
             onMouseEnter={e => { e.currentTarget.style.color = '#00d4ff'; }}
             onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}
           >
             Cursos
+          </button>
+          <button
+            onClick={() => navigate('/meus-cursos')}
+            style={{
+              fontFamily: 'var(--font-body)', fontSize: '0.875rem', fontWeight: '500',
+              color: 'rgba(255,255,255,0.6)', background: 'none', border: '1px solid transparent',
+              cursor: 'pointer', padding: '7px 14px', borderRadius: '8px', transition: 'color 0.2s ease, background 0.2s ease',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.color = '#00d4ff'; e.currentTarget.style.background = 'rgba(0,212,255,0.06)'; }}
+            onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; e.currentTarget.style.background = 'none'; }}
+          >
+            Meus Cursos
           </button>
 
           {user && (
