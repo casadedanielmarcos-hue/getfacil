@@ -1,5 +1,7 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../../firebase';
 import { useAuth } from '../../contexts/AuthContext';
 import { useData } from '../../contexts/DataContext';
 import { CheckCircle, ChevronRight, ArrowLeft } from 'lucide-react';
@@ -45,6 +47,20 @@ export function AulaPlayer() {
   const proxima = getProximaAula();
   const aulaAssistida = progressoAluno?.aulasAssistidas.includes(aulaId);
 
+  // undefined = carregando, null = não encontrado, string = URL do Firebase Storage
+  const [arquivoUrl, setArquivoUrl] = useState(undefined);
+
+  useEffect(() => {
+    if (!aulaAtual || !moduloAtual) return;
+    setArquivoUrl(undefined);
+    getDoc(doc(db, 'cursos', cursoId, 'modulos', moduloAtual.id, 'aulas', aulaId))
+      .then(snap => {
+        const url = snap.exists() ? snap.data().arquivoUrl : null;
+        setArquivoUrl(url || null);
+      })
+      .catch(() => setArquivoUrl(null));
+  }, [cursoId, moduloAtual?.id, aulaId]);
+
   // Auto-marca como assistida após 5s de visualização
   useEffect(() => {
     if (!aulaAssistida && aulaAtual && progressoAluno) {
@@ -69,9 +85,22 @@ export function AulaPlayer() {
   }
 
   const isRise = aulaAtual.type === 'rise360';
-  const iframeSrc = isRise
-    ? `/getfacil/Cursos/${curso.slug}/${encodeURIComponent(aulaAtual.slug)}/index.html`
-    : aulaAtual.url;
+  const githubFallback = `/getfacil/Cursos/${curso.slug}/${encodeURIComponent(aulaAtual.slug)}/index.html`;
+
+  // Prioridade: Firebase Storage → GitHub Pages (só Rise) → URL da aula (YouTube etc.)
+  let iframeSrc = null;
+  let conteudoIndisponivel = false;
+  if (arquivoUrl === undefined) {
+    // ainda carregando — aguarda
+  } else if (arquivoUrl) {
+    iframeSrc = arquivoUrl;
+  } else if (isRise) {
+    iframeSrc = githubFallback;
+  } else if (aulaAtual.url) {
+    iframeSrc = aulaAtual.url;
+  } else {
+    conteudoIndisponivel = true;
+  }
 
   return (
     <div style={{
@@ -205,7 +234,31 @@ export function AulaPlayer() {
       </nav>
 
       {/* ── Conteúdo ─────────────────────────────────────────── */}
-      {isRise ? (
+      {arquivoUrl === undefined ? (
+        <div style={{
+          flex: 1,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: '#000',
+        }}>
+          <p style={{ color: 'rgba(255,255,255,0.4)', fontFamily: 'var(--font-body)', fontSize: '0.85rem' }}>
+            Carregando aula...
+          </p>
+        </div>
+      ) : conteudoIndisponivel ? (
+        <div style={{
+          flex: 1,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: '#000',
+        }}>
+          <p style={{ color: 'rgba(255,255,255,0.4)', fontFamily: 'var(--font-body)', fontSize: '0.85rem' }}>
+            Conteúdo não disponível ainda
+          </p>
+        </div>
+      ) : (isRise || arquivoUrl) ? (
         <iframe
           key={iframeSrc}
           src={iframeSrc}
@@ -221,7 +274,6 @@ export function AulaPlayer() {
           title={aulaAtual.title}
         />
       ) : (
-        // Player YouTube (tipo "video" — cursos futuros)
         <div style={{
           flex: 1,
           display: 'flex',
@@ -230,7 +282,7 @@ export function AulaPlayer() {
           background: '#000',
         }}>
           <iframe
-            src={aulaAtual.url}
+            src={iframeSrc}
             style={{
               width: '100%',
               maxWidth: '1280px',
