@@ -863,7 +863,7 @@ export function Home() {
   const coursesRef = useRef(null);
   const trackRef = useRef(null);
 
-  const matriculados = user?.cursosMatriculados || [];
+  const matriculados = (user?.cursosMatriculados || []).map(c => typeof c === 'string' ? c : c?.id).filter(Boolean);
   const cursosVisiveis = cursos;
 
   const [offset, setOffset] = useState(0);

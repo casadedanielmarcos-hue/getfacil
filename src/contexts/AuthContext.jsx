@@ -21,12 +21,14 @@ export function AuthProvider({ children }) {
           const snap = await getDoc(doc(db, 'alunos', firebaseUser.uid));
           if (snap.exists()) {
             const d = snap.data();
+            const normIds = (arr) =>
+              (arr || []).map(c => (typeof c === 'string' ? c : c?.id)).filter(Boolean);
             setUser({
               id: firebaseUser.uid,
               uid: firebaseUser.uid,
               nome: d.nome || firebaseUser.email,
               email: d.email || firebaseUser.email,
-              cursosMatriculados: d.cursosMatriculados || [],
+              cursosMatriculados: normIds(d.cursosMatriculados),
               progresso: d.progresso || {},
               status: d.status || 'ativo',
             });

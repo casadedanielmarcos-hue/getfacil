@@ -209,7 +209,8 @@ export function MeusCursos() {
   const { cursos, getProgressoCurso, calcularProgresso } = useData();
   const navigate = useNavigate();
 
-  const meusCursos = cursos.filter(c => user?.cursosMatriculados?.includes(c.id));
+  const cursoIds = (user?.cursosMatriculados || []).map(c => typeof c === 'string' ? c : c?.id).filter(Boolean);
+  const meusCursos = cursos.filter(c => cursoIds.includes(c.id));
 
   const navBtnStyle = (active = false) => ({
     fontFamily: 'var(--font-body)', fontSize: '0.875rem', fontWeight: active ? '600' : '500',
