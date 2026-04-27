@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { doc, updateDoc, arrayUnion, collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useAuth } from './AuthContext';
+import { courses } from '../data/courses';
 
 const DataContext = createContext(null);
 
@@ -65,13 +66,23 @@ export function DataProvider({ children }) {
   const [cursos, setCursos] = useState([]);
   const pendingSave = useRef(null);
 
-  // Carrega cursos publicados do Firestore (mesma coleção gerenciada pelo portal-gestor)
+  // Carrega cursos do Firestore e mescla com dados estáticos.
+  // Cursos estáticos têm prioridade: possuem slug/tipo corretos para conteúdo
+  // em public/Cursos/. Cursos do Firestore com mesmo ID/slug são ignorados.
   useEffect(() => {
+    const staticIds = new Set(courses.flatMap(c => [c.id, c.slug].filter(Boolean)));
+
     getDocs(query(collection(db, 'cursos'), where('publicado', '==', true)))
       .then(snap => {
-        setCursos(snap.docs.map(d => normalizeCurso(d.id, d.data())));
+        const novos = snap.docs
+          .map(d => normalizeCurso(d.id, d.data()))
+          .filter(c => !staticIds.has(c.id));
+        setCursos([...courses, ...novos]);
       })
-      .catch(err => console.error('Erro ao carregar cursos:', err));
+      .catch(err => {
+        console.error('Erro ao carregar cursos:', err);
+        setCursos(courses);
+      });
   }, []);
 
   useEffect(() => {
