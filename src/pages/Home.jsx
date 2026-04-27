@@ -480,12 +480,14 @@ function ScifiCourseCard({ course, onClick }) {
   );
 }
 
-// ── Course Card (padrão — em construção) ────────────────────────────────────
+// ── Course Card (disponível — clicável) ─────────────────────────────────────
 function CourseCard({ course, onClick }) {
   const [hovered, setHovered] = useState(false);
+  const accent = course.accentColor || '#00d4ff';
 
   return (
     <div
+      onClick={onClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
@@ -494,64 +496,56 @@ function CourseCard({ course, onClick }) {
         height: '380px',
         borderRadius: '14px',
         overflow: 'hidden',
-        cursor: 'default',
+        cursor: 'pointer',
         position: 'relative',
-        background: course.coverColor,
-        border: '1px solid rgba(255,255,255,0.05)',
-        opacity: 0.45,
-        filter: 'grayscale(40%)',
-        transition: 'all 0.3s ease',
+        background: course.imagemCapa
+          ? `url(${course.imagemCapa}) center/cover`
+          : course.coverColor,
+        border: `1px solid ${hovered ? `${accent}99` : `${accent}33`}`,
+        transform: hovered ? 'scale(1.04) translateY(-6px)' : 'scale(1)',
+        boxShadow: hovered
+          ? `0 24px 60px rgba(0,0,0,0.7), 0 0 40px ${accent}33`
+          : '0 8px 32px rgba(0,0,0,0.5)',
+        transition: 'all 0.3s cubic-bezier(0.34,1.56,0.64,1)',
       }}
     >
       {/* Grid overlay */}
       <div style={{
         position: 'absolute', inset: 0,
         backgroundImage: `
-          linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)
+          linear-gradient(${accent}08 1px, transparent 1px),
+          linear-gradient(90deg, ${accent}08 1px, transparent 1px)
         `,
         backgroundSize: '24px 24px',
-        opacity: 0.4,
       }} />
 
       {/* Bottom gradient */}
       <div style={{
         position: 'absolute', inset: 0,
-        background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 50%, transparent 100%)',
+        background: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.35) 55%, rgba(0,0,0,0.1) 100%)',
       }} />
 
-      {/* "Em construção" badge — centro */}
+      {/* "DISPONÍVEL" badge */}
       <div style={{
-        position: 'absolute',
-        top: '50%', left: '50%',
-        transform: 'translate(-50%, -50%)',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: '8px',
-        zIndex: 2,
+        position: 'absolute', top: '18px', right: '18px',
+        padding: '3px 9px',
+        borderRadius: '4px',
+        background: `${accent}1a`,
+        border: `1px solid ${accent}55`,
+        fontSize: '0.58rem',
+        fontWeight: '700',
+        color: accent,
+        letterSpacing: '2px',
+        textTransform: 'uppercase',
+        fontFamily: 'var(--font-body)',
       }}>
-        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-          <path d="M14 3l2.5 7.5H24l-6 4.5 2.5 7.5L14 18l-6.5 4.5 2.5-7.5L4 10.5h7.5L14 3z"
-            stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" strokeLinejoin="round" />
-        </svg>
-        <span style={{
-          fontFamily: 'var(--font-body)',
-          fontSize: '0.65rem',
-          fontWeight: '600',
-          color: 'rgba(255,255,255,0.4)',
-          textTransform: 'uppercase',
-          letterSpacing: '2.5px',
-          textAlign: 'center',
-        }}>
-          Em construção
-        </span>
+        DISPONÍVEL
       </div>
 
       {/* Content */}
       <div style={{
         position: 'absolute', inset: 0,
-        padding: '24px',
+        padding: '22px',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
@@ -560,55 +554,50 @@ function CourseCard({ course, onClick }) {
         <div style={{
           width: '52px', height: '52px',
           borderRadius: '12px',
-          background: 'rgba(0,0,0,0.4)',
+          background: 'rgba(0,0,0,0.5)',
           backdropFilter: 'blur(8px)',
-          border: `1px solid ${course.accentColor}22`,
+          border: `1px solid ${accent}44`,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: `${course.accentColor}66`,
+          color: accent,
+          boxShadow: hovered ? `0 0 16px ${accent}44` : 'none',
+          transition: 'box-shadow 0.3s ease',
         }}>
-          {ICONS[course.id]}
+          {ICONS[course.id] || (
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+              <path d="M6 8h16M6 14h10M6 20h12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+            </svg>
+          )}
         </div>
 
         {/* Bottom info */}
         <div>
           <p style={{
-            fontSize: '0.7rem',
-            fontWeight: '500',
-            color: `${course.accentColor}66`,
-            textTransform: 'uppercase',
-            letterSpacing: '1.5px',
-            fontFamily: 'var(--font-body)',
-            marginBottom: '8px',
+            fontSize: '0.65rem', fontWeight: '600',
+            color: `${accent}bb`,
+            textTransform: 'uppercase', letterSpacing: '1.5px',
+            fontFamily: 'var(--font-body)', marginBottom: '6px',
           }}>
             {course.subtitle}
           </p>
           <h3 style={{
             fontFamily: 'var(--font-display)',
-            fontSize: '1.2rem',
-            fontWeight: '700',
-            color: '#ffffff',
-            lineHeight: '1.25',
-            marginBottom: '20px',
+            fontSize: '1.2rem', fontWeight: '700',
+            color: '#ffffff', lineHeight: '1.25', marginBottom: '18px',
+            textShadow: hovered ? `0 0 20px ${accent}44` : 'none',
+            transition: 'text-shadow 0.3s ease',
           }}>
             {course.title}
           </h3>
 
-          {/* CTA */}
           <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '6px',
-            padding: '10px 0',
-            borderRadius: '8px',
-            background: hovered ? `${course.accentColor}22` : 'rgba(255,255,255,0.06)',
-            border: `1px solid ${hovered ? `${course.accentColor}66` : 'rgba(255,255,255,0.1)'}`,
-            color: hovered ? course.accentColor : 'rgba(255,255,255,0.7)',
-            fontFamily: 'var(--font-body)',
-            fontWeight: '600',
-            fontSize: '0.85rem',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
+            padding: '10px 0', borderRadius: '8px',
+            background: hovered ? `${accent}22` : `${accent}0d`,
+            border: `1px solid ${hovered ? `${accent}77` : `${accent}33`}`,
+            color: accent,
+            fontFamily: 'var(--font-body)', fontWeight: '600', fontSize: '0.85rem',
             transition: 'all 0.25s ease',
           }}>
             Acessar curso
@@ -1225,21 +1214,29 @@ export function Home() {
               userSelect: 'none',
             }}
           >
-            {cursosVisiveis.map(course =>
-              matriculados.includes(course.id) ? (
-                <ScifiCourseCard
-                  key={course.id}
-                  course={course}
-                  onClick={() => !isDragging && navigate(`/curso/${course.id}`)}
-                />
-              ) : (
+            {cursosVisiveis.map(course => {
+              if (!course.disponivel) return (
                 <LockedCourseCard
                   key={course.id}
                   course={course}
                   onSolicitarMatricula={() => setSolicitacaoModal(course)}
                 />
-              )
-            )}
+              );
+              if (course.id === 'c2') return (
+                <ScifiCourseCard
+                  key={course.id}
+                  course={course}
+                  onClick={() => !isDragging && navigate(`/curso/${course.id}`)}
+                />
+              );
+              return (
+                <CourseCard
+                  key={course.id}
+                  course={course}
+                  onClick={() => !isDragging && navigate(`/curso/${course.id}`)}
+                />
+              );
+            })}
           </div>
         </div>
 

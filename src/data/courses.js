@@ -63,6 +63,7 @@ export const courses = [
   },
   {
     id: 'c2',
+    disponivel: true,
     title: 'Pensamento Computacional',
     subtitle: 'Lógica e Resolução de Problemas',
     description: 'Desenvolva o raciocínio lógico e estruturado para resolver problemas complexos. Aprenda decomposição, padrões, abstração e algoritmos na prática.',

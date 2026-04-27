@@ -11,6 +11,7 @@ const DataContext = createContext(null);
 function normalizeCurso(id, data) {
   return {
     id,
+    disponivel: true,
     title: data.titulo || '',
     subtitle: data.subtitulo || '',
     description: data.subtitulo || '',
