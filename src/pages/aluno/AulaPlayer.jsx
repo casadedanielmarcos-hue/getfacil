@@ -52,6 +52,14 @@ export function AulaPlayer() {
 
   useEffect(() => {
     if (!aulaAtual || !moduloAtual) return;
+
+    // URL já presente nos dados normalizados (portal-gestor, array embutido no documento)
+    if (aulaAtual.url) {
+      setArquivoUrl(aulaAtual.url);
+      return;
+    }
+
+    // Fallback legado: subcoleção criada manualmente antes do portal-gestor
     setArquivoUrl(undefined);
     getDoc(doc(db, 'cursos', cursoId, 'modulos', moduloAtual.id, 'aulas', aulaId))
       .then(snap => {
@@ -59,7 +67,7 @@ export function AulaPlayer() {
         setArquivoUrl(url || null);
       })
       .catch(() => setArquivoUrl(null));
-  }, [cursoId, moduloAtual?.id, aulaId]);
+  }, [cursoId, moduloAtual?.id, aulaId, aulaAtual?.url]);
 
   // Auto-marca como assistida após 5s de visualização
   useEffect(() => {
@@ -84,7 +92,7 @@ export function AulaPlayer() {
     );
   }
 
-  const isRise = aulaAtual.type === 'rise360';
+  const isRise = aulaAtual.type === 'rise360' || aulaAtual.tipo === 'rise360';
   const githubFallback = `/getfacil/Cursos/${curso.slug}/${encodeURIComponent(aulaAtual.slug)}/index.html`;
 
   // Prioridade: Firebase Storage → GitHub Pages (só Rise) → URL da aula (YouTube etc.)

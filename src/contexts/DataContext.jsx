@@ -23,7 +23,8 @@ function normalizeCurso(id, data) {
       lessons: (m.aulas || []).map((a, ai) => ({
         id: a.id || `l${ai}`,
         title: a.titulo || '',
-        url: a.arquivoUrl || '',
+        url: a.arquivoUrl || a.arquivoPath || '',
+        tipo: a.tipo || '',
         duration: '',
         order: ai + 1,
       })),
