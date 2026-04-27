@@ -1,10 +1,37 @@
 import { createContext, useContext, useState, useEffect, useRef } from 'react';
-import { doc, updateDoc, arrayUnion } from 'firebase/firestore';
+import { doc, updateDoc, arrayUnion, collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useAuth } from './AuthContext';
-import { courses } from '../data/courses';
 
 const DataContext = createContext(null);
+
+// Normaliza um documento do Firestore (formato portal-gestor) para o formato
+// que o getfacil espera internamente: { title, subtitle, modules[].lessons[] }
+function normalizeCurso(id, data) {
+  return {
+    id,
+    title: data.titulo || '',
+    subtitle: data.subtitulo || '',
+    description: data.subtitulo || '',
+    coverColor: data.cor || '#00d4ff',
+    accentColor: data.cor || '#00d4ff',
+    imagemCapa: data.imagemCapa || '',
+    modules: (data.modulos || []).map((m, mi) => ({
+      id: m.id || `m${mi}`,
+      title: m.titulo || '',
+      order: mi + 1,
+      lessons: (m.aulas || []).map((a, ai) => ({
+        id: a.id || `l${ai}`,
+        title: a.titulo || '',
+        url: a.arquivoUrl || '',
+        duration: '',
+        order: ai + 1,
+      })),
+      quiz: null,
+    })),
+    finalExam: null,
+  };
+}
 
 function firestoreToLocal(uid, progrMap) {
   return Object.entries(progrMap || {}).map(([cursoId, p]) => ({
@@ -32,7 +59,17 @@ function localToFirestore(uid, progressoArray) {
 export function DataProvider({ children }) {
   const { user, addCursoMatriculado, updateProgresso } = useAuth();
   const [progresso, setProgresso] = useState([]);
+  const [cursos, setCursos] = useState([]);
   const pendingSave = useRef(null);
+
+  // Carrega cursos publicados do Firestore (mesma coleção gerenciada pelo portal-gestor)
+  useEffect(() => {
+    getDocs(query(collection(db, 'cursos'), where('publicado', '==', true)))
+      .then(snap => {
+        setCursos(snap.docs.map(d => normalizeCurso(d.id, d.data())));
+      })
+      .catch(err => console.error('Erro ao carregar cursos:', err));
+  }, []);
 
   useEffect(() => {
     if (user) {
@@ -57,7 +94,7 @@ export function DataProvider({ children }) {
   };
 
   const calcularProgresso = (cursoId, alunoId) => {
-    const curso = courses.find(c => c.id === cursoId);
+    const curso = cursos.find(c => c.id === cursoId);
     const prog = progresso.find(p => p.cursoId === cursoId && p.alunoId === alunoId);
     if (!curso || !prog) return 0;
     const total = curso.modules.reduce((acc, m) => acc + m.lessons.length, 0);
@@ -103,7 +140,7 @@ export function DataProvider({ children }) {
     progresso
       .filter(p => p.alunoId === alunoId && p.status === 'andamento')
       .map(p => {
-        const c = courses.find(c => c.id === p.cursoId);
+        const c = cursos.find(c => c.id === p.cursoId);
         return c ? { ...c, progresso: calcularProgresso(p.cursoId, alunoId), status: p.status } : null;
       })
       .filter(Boolean);
@@ -112,7 +149,7 @@ export function DataProvider({ children }) {
     progresso
       .filter(p => p.alunoId === alunoId && p.status === 'finalizado')
       .map(p => {
-        const c = courses.find(c => c.id === p.cursoId);
+        const c = cursos.find(c => c.id === p.cursoId);
         return c ? { ...c, progresso: 100, status: p.status, resultado: p.resultado } : null;
       })
       .filter(Boolean);
@@ -178,7 +215,7 @@ export function DataProvider({ children }) {
 
   return (
     <DataContext.Provider value={{
-      cursos: courses,
+      cursos,
       progresso,
       getCursosEmAndamento,
       getCursosFinalizados,
