@@ -16,6 +16,7 @@ function normalizeCurso(id, data) {
     coverColor: data.cor || '#00d4ff',
     accentColor: data.cor || '#00d4ff',
     imagemCapa: data.imagemCapa || '',
+    slug: data.slug || id,
     modules: (data.modulos || []).map((m, mi) => ({
       id: m.id || `m${mi}`,
       title: m.titulo || '',
@@ -23,8 +24,9 @@ function normalizeCurso(id, data) {
       lessons: (m.aulas || []).map((a, ai) => ({
         id: a.id || `l${ai}`,
         title: a.titulo || '',
-        url: a.arquivoUrl || a.arquivoPath || '',
+        url: a.arquivoUrl || '',
         tipo: a.tipo || '',
+        slug: a.slug || '',
         duration: '',
         order: ai + 1,
       })),

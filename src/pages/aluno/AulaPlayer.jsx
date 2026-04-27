@@ -53,13 +53,14 @@ export function AulaPlayer() {
   useEffect(() => {
     if (!aulaAtual || !moduloAtual) return;
 
-    // URL já presente nos dados normalizados (portal-gestor, array embutido no documento)
-    if (aulaAtual.url) {
+    // Se a aula já tem uma URL HTTP válida (Firebase Storage via portal-gestor),
+    // usa diretamente sem consultar subcoleção
+    if (aulaAtual.url && aulaAtual.url.startsWith('http')) {
       setArquivoUrl(aulaAtual.url);
       return;
     }
 
-    // Fallback legado: subcoleção criada manualmente antes do portal-gestor
+    // Fallback: subcoleção do Firestore (cursos criados antes do portal-gestor)
     setArquivoUrl(undefined);
     getDoc(doc(db, 'cursos', cursoId, 'modulos', moduloAtual.id, 'aulas', aulaId))
       .then(snap => {
