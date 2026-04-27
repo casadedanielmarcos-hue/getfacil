@@ -48,7 +48,16 @@ export function AuthProvider({ children }) {
           setUser(null);
         }
       } else {
-        setUser(null);
+        // Sem login: usuário guest com acesso completo aos cursos
+        setUser({
+          id: 'guest',
+          uid: 'guest',
+          nome: 'Visitante',
+          email: '',
+          cursosMatriculados: [],
+          progresso: {},
+          status: 'ativo',
+        });
       }
       setLoading(false);
     });

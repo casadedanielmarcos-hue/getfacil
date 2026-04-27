@@ -94,7 +94,7 @@ export function DataProvider({ children }) {
   }, [user?.id]);
 
   const saveToFirestore = (userId, newProgresso) => {
-    if (!userId) return;
+    if (!userId || userId === 'guest') return;
     if (pendingSave.current) clearTimeout(pendingSave.current);
     pendingSave.current = setTimeout(async () => {
       try {
@@ -133,6 +133,7 @@ export function DataProvider({ children }) {
     setProgresso(prev => [...prev, newEntry]);
 
     try {
+      if (alunoId === 'guest') return;
       await updateDoc(doc(db, 'alunos', alunoId), {
         cursosMatriculados: arrayUnion(cursoId),
         [`progresso.${cursoId}`]: {
