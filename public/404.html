@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <title>GetFutureToday</title>
+    <script>
+      // SPA fallback para GitHub Pages (rafgraph/spa-github-pages)
+      // Converte o path em query string e redireciona para index.html,
+      // que restaura a URL original antes do React montar.
+      // pathSegmentsToKeep = 1 porque o site fica em /getfacil/
+      var pathSegmentsToKeep = 1;
+      var l = window.location;
+      l.replace(
+        l.protocol + '//' + l.host + '/' +
+        l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/?/' +
+        l.pathname.split('/').slice(1 + pathSegmentsToKeep).join('/').replace(/&/g, '~and~') +
+        (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+        l.hash
+      );
+    </script>
+  </head>
+  <body></body>
+</html>
