@@ -47,27 +47,42 @@ export function AulaPlayer() {
   const proxima = getProximaAula();
   const aulaAssistida = progressoAluno?.aulasAssistidas.includes(aulaId);
 
-  // undefined = carregando, null = não encontrado, string = URL do Firebase Storage
-  const [arquivoUrl, setArquivoUrl] = useState(undefined);
+  // undefined = carregando, null = não encontrado, string = URL resolvida
+  const [resolvedUrl, setResolvedUrl] = useState(undefined);
 
   useEffect(() => {
     if (!aulaAtual || !moduloAtual) return;
 
-    // Se a aula já tem uma URL HTTP válida (Firebase Storage via portal-gestor),
-    // usa diretamente sem consultar subcoleção
+    // Prioridade 1: URL HTTP direta (GitHub Pages ou Firebase Storage)
+    // Isso cobre tanto URLs do novo upload (GitHub Pages) quanto URLs legadas do Firebase Storage
     if (aulaAtual.url && aulaAtual.url.startsWith('http')) {
-      setArquivoUrl(aulaAtual.url);
+      setResolvedUrl(aulaAtual.url);
       return;
     }
 
-    // Fallback: subcoleção do Firestore (cursos criados antes do portal-gestor)
-    setArquivoUrl(undefined);
+    // Prioridade 2: URL relativa (legado — arquivoPath do seed)
+    // Ex: /cursos/pensamento-computacional/introducao/index.html
+    if (aulaAtual.url && aulaAtual.url.startsWith('/')) {
+      setResolvedUrl(aulaAtual.url);
+      return;
+    }
+
+    // Prioridade 3: Conteúdo Rise 360 estático no GitHub Pages (fallback por slug)
+    const isRise = aulaAtual.type === 'rise360' || aulaAtual.tipo === 'rise360';
+    if (isRise && aulaAtual.slug && curso?.slug) {
+      const githubFallback = `/getfacil/Cursos/${curso.slug}/${encodeURIComponent(aulaAtual.slug)}/index.html`;
+      setResolvedUrl(githubFallback);
+      return;
+    }
+
+    // Prioridade 4: Subcoleção do Firestore (cursos criados antes do portal-gestor)
+    setResolvedUrl(undefined);
     getDoc(doc(db, 'cursos', cursoId, 'modulos', moduloAtual.id, 'aulas', aulaId))
       .then(snap => {
         const url = snap.exists() ? snap.data().arquivoUrl : null;
-        setArquivoUrl(url || null);
+        setResolvedUrl(url || null);
       })
-      .catch(() => setArquivoUrl(null));
+      .catch(() => setResolvedUrl(null));
   }, [cursoId, moduloAtual?.id, aulaId, aulaAtual?.url]);
 
   // Auto-marca como assistida após 5s de visualização
@@ -94,19 +109,14 @@ export function AulaPlayer() {
   }
 
   const isRise = aulaAtual.type === 'rise360' || aulaAtual.tipo === 'rise360';
-  const githubFallback = `/getfacil/Cursos/${curso.slug}/${encodeURIComponent(aulaAtual.slug)}/index.html`;
 
-  // Prioridade: Firebase Storage → GitHub Pages (só Rise) → URL da aula (YouTube etc.)
+  // Determinar o que renderizar
   let iframeSrc = null;
   let conteudoIndisponivel = false;
-  if (arquivoUrl === undefined) {
+  if (resolvedUrl === undefined) {
     // ainda carregando — aguarda
-  } else if (arquivoUrl) {
-    iframeSrc = arquivoUrl;
-  } else if (isRise) {
-    iframeSrc = githubFallback;
-  } else if (aulaAtual.url) {
-    iframeSrc = aulaAtual.url;
+  } else if (resolvedUrl) {
+    iframeSrc = resolvedUrl;
   } else {
     conteudoIndisponivel = true;
   }
@@ -243,7 +253,7 @@ export function AulaPlayer() {
       </nav>
 
       {/* ── Conteúdo ─────────────────────────────────────────── */}
-      {arquivoUrl === undefined ? (
+      {resolvedUrl === undefined ? (
         <div style={{
           flex: 1,
           display: 'flex',
@@ -267,7 +277,7 @@ export function AulaPlayer() {
             Conteúdo não disponível ainda
           </p>
         </div>
-      ) : (isRise || arquivoUrl) ? (
+      ) : (isRise || (iframeSrc && !iframeSrc.includes('youtube'))) ? (
         <iframe
           key={iframeSrc}
           src={iframeSrc}

@@ -2,12 +2,17 @@ import { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { doc, updateDoc, arrayUnion, collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useAuth } from './AuthContext';
-import { courses } from '../data/courses';
+import { courses as staticCourses } from '../data/courses';
 
 const DataContext = createContext(null);
 
-// Normaliza um documento do Firestore (formato portal-gestor) para o formato
-// que o getfacil espera internamente: { title, subtitle, modules[].lessons[] }
+/**
+ * Normaliza um documento do Firestore (formato portal-gestor) para o formato
+ * que o getfacil espera internamente: { title, subtitle, modules[].lessons[] }
+ *
+ * Agora lê tanto `arquivoUrl` (upload via GitHub) quanto `arquivoPath` (seed legado)
+ * e resolve a URL correta para o conteúdo Rise 360.
+ */
 function normalizeCurso(id, data) {
   return {
     id,
@@ -26,7 +31,8 @@ function normalizeCurso(id, data) {
       lessons: (m.aulas || []).map((a, ai) => ({
         id: a.id || `l${ai}`,
         title: a.titulo || '',
-        url: a.arquivoUrl || '',
+        // Prioridade: arquivoUrl (GitHub Pages URL) > arquivoPath (legado)
+        url: a.arquivoUrl || a.arquivoPath || '',
         tipo: a.tipo || '',
         slug: a.slug || '',
         duration: '',
@@ -67,22 +73,29 @@ export function DataProvider({ children }) {
   const [cursos, setCursos] = useState([]);
   const pendingSave = useRef(null);
 
-  // Carrega cursos do Firestore e mescla com dados estáticos.
-  // Cursos estáticos têm prioridade: possuem slug/tipo corretos para conteúdo
-  // em public/Cursos/. Cursos do Firestore com mesmo ID/slug são ignorados.
+  /**
+   * Carrega cursos do Firestore e mescla com dados estáticos.
+   *
+   * NOVA LÓGICA: Cursos do Firestore têm PRIORIDADE sobre estáticos.
+   * Se um curso do Firestore tem o mesmo slug que um estático, o do Firestore é usado.
+   * Cursos estáticos que NÃO existem no Firestore são mantidos como fallback.
+   */
   useEffect(() => {
-    const staticIds = new Set(courses.flatMap(c => [c.id, c.slug].filter(Boolean)));
-
     getDocs(query(collection(db, 'cursos'), where('publicado', '==', true)))
       .then(snap => {
-        const novos = snap.docs
-          .map(d => normalizeCurso(d.id, d.data()))
-          .filter(c => !staticIds.has(c.id));
-        setCursos([...courses, ...novos]);
+        const firestoreCursos = snap.docs.map(d => normalizeCurso(d.id, d.data()));
+        const firestoreIds = new Set(firestoreCursos.flatMap(c => [c.id, c.slug].filter(Boolean)));
+
+        // Cursos estáticos que NÃO existem no Firestore (fallback)
+        const staticFallback = staticCourses.filter(c =>
+          !firestoreIds.has(c.id) && !firestoreIds.has(c.slug)
+        );
+
+        setCursos([...firestoreCursos, ...staticFallback]);
       })
       .catch(err => {
         console.error('Erro ao carregar cursos:', err);
-        setCursos(courses);
+        setCursos(staticCourses);
       });
   }, []);
 
