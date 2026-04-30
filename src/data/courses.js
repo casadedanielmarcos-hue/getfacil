@@ -5,6 +5,7 @@ export const STUDENT_ID = 'student1';
 export const courses = [
   {
     id: 'c1',
+    slug: 'canva',
     title: 'Canva',
     subtitle: 'Design Gráfico Profissional',
     description: 'Domine o Canva do zero ao avançado. Crie peças visuais impactantes para redes sociais, apresentações e materiais profissionais sem precisar ser designer.',
@@ -73,6 +74,7 @@ export const courses = [
   },
   {
     id: 'c3',
+    slug: 'guia-sobrevivencia-offline',
     title: 'Guia de Sobrevivência Offline',
     subtitle: 'Habilidades para o Mundo Real',
     description: 'Desenvolva competências práticas essenciais para o dia a dia profissional e pessoal — comunicação, organização, finanças pessoais e produtividade sem depender da tecnologia.',
@@ -131,6 +133,7 @@ export const courses = [
   },
   {
     id: 'c4',
+    slug: 'design-instrucional',
     title: 'Design Instrucional',
     subtitle: 'Criação de Experiências de Aprendizagem',
     description: 'Aprenda a projetar cursos e treinamentos que realmente ensinam. Domine taxonomias, metodologias ativas, mapas de conteúdo e avaliação de aprendizagem.',

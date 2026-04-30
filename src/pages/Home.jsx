@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useData } from '../contexts/DataContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -669,7 +669,6 @@ function LockedCourseCard({ course }) {
   );
 }
 
-// ── Solicitation Modal ───────────────────────────────────────────────────────
 // ── Home Page ───────────────────────────────────────────────────────────────
 const CARD_W = 260;
 const CARD_GAP = 20;
@@ -680,37 +679,109 @@ export function Home() {
   const { cursos } = useData();
   const { user, logout } = useAuth();
   const coursesRef = useRef(null);
-  const trackRef = useRef(null);
 
   const cursosVisiveis = cursos;
+  const N = cursosVisiveis.length;
+  const totalW = N * CARD_STEP;
+  const tripled = useMemo(
+    () => N > 0 ? [...cursosVisiveis, ...cursosVisiveis, ...cursosVisiveis] : [],
+    [cursosVisiveis]
+  );
 
   const [offset, setOffset] = useState(0);
+  const [animated, setAnimated] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
-  const [dragStartX, setDragStartX] = useState(0);
+  const [ready, setReady] = useState(false);
 
-  const getMaxOffset = () => {
-    const containerW = trackRef.current?.parentElement?.offsetWidth || 320;
-    const totalW = cursosVisiveis.length * CARD_STEP - CARD_GAP;
-    return Math.min(0, containerW - totalW - 48);
+  const offsetRef = useRef(0);
+  const dragStartXRef = useRef(0);
+  const jumpPendingRef = useRef(false);
+
+  useEffect(() => { offsetRef.current = offset; }, [offset]);
+
+  useEffect(() => {
+    if (N > 0 && !ready) {
+      setOffset(-totalW);
+      setReady(true);
+      requestAnimationFrame(() => setAnimated(true));
+    }
+  }, [N, totalW, ready]);
+
+  const normalize = (off) => {
+    if (N === 0) return 0;
+    let r = off;
+    while (r > -totalW) r -= totalW;
+    while (r < -2 * totalW) r += totalW;
+    return r;
   };
 
-  const scrollLeft = () => setOffset(prev => Math.min(prev + CARD_STEP, 0));
-  const scrollRight = () => setOffset(prev => Math.max(prev - CARD_STEP, getMaxOffset()));
-  const canLeft = offset < 0;
-  const canRight = offset > getMaxOffset();
+  const scrollLeft = () => {
+    if (jumpPendingRef.current) return;
+    setAnimated(true);
+    setOffset(prev => {
+      const next = prev + CARD_STEP;
+      if (next > -totalW) {
+        jumpPendingRef.current = true;
+        setTimeout(() => {
+          setAnimated(false);
+          setOffset(next - totalW);
+          requestAnimationFrame(() => { setAnimated(true); jumpPendingRef.current = false; });
+        }, 420);
+      }
+      return next;
+    });
+  };
 
-  const onMouseDown = e => { setIsDragging(true); setDragStartX(e.clientX - offset); };
-  const onMouseMove = e => {
+  const scrollRight = () => {
+    if (jumpPendingRef.current) return;
+    setAnimated(true);
+    setOffset(prev => {
+      const next = prev - CARD_STEP;
+      if (next < -2 * totalW) {
+        jumpPendingRef.current = true;
+        setTimeout(() => {
+          setAnimated(false);
+          setOffset(next + totalW);
+          requestAnimationFrame(() => { setAnimated(true); jumpPendingRef.current = false; });
+        }, 420);
+      }
+      return next;
+    });
+  };
+
+  const onMouseDown = (e) => {
+    setIsDragging(true);
+    dragStartXRef.current = e.clientX - offsetRef.current;
+    setAnimated(false);
+  };
+  const onMouseMove = (e) => {
     if (!isDragging) return;
-    setOffset(Math.max(Math.min(e.clientX - dragStartX, 0), getMaxOffset()));
+    setOffset(e.clientX - dragStartXRef.current);
   };
-  const onMouseUp = () => setIsDragging(false);
+  const onMouseUp = () => {
+    if (!isDragging) return;
+    setIsDragging(false);
+    const snap = Math.round(-offsetRef.current / CARD_STEP) * CARD_STEP;
+    setAnimated(true);
+    setOffset(normalize(-snap));
+  };
 
-  const onTouchStart = e => setDragStartX(e.touches[0].clientX - offset);
-  const onTouchMove = e => {
-    const next = e.touches[0].clientX - dragStartX;
-    setOffset(Math.max(Math.min(next, 0), getMaxOffset()));
+  const onTouchStart = (e) => {
+    dragStartXRef.current = e.touches[0].clientX - offsetRef.current;
+    setAnimated(false);
   };
+  const onTouchMove = (e) => {
+    setIsDragging(true);
+    setOffset(e.touches[0].clientX - dragStartXRef.current);
+  };
+  const onTouchEnd = () => {
+    setIsDragging(false);
+    const snap = Math.round(-offsetRef.current / CARD_STEP) * CARD_STEP;
+    setAnimated(true);
+    setOffset(normalize(-snap));
+  };
+
+  const activeIdx = N > 0 ? (((Math.round(-offset / CARD_STEP) % N) + N) % N) : 0;
 
   const scrollToCourses = () => {
     coursesRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -987,25 +1058,24 @@ export function Home() {
           {/* Arrows */}
           <div style={{ display: 'flex', gap: '8px' }}>
             {[
-              { can: canLeft, fn: scrollLeft, d: 'left' },
-              { can: canRight, fn: scrollRight, d: 'right' },
-            ].map(({ can, fn, d }) => (
+              { fn: scrollLeft, d: 'left' },
+              { fn: scrollRight, d: 'right' },
+            ].map(({ fn, d }) => (
               <button
                 key={d}
                 onClick={fn}
-                disabled={!can}
                 style={{
                   width: '40px', height: '40px',
                   borderRadius: '50%',
-                  border: `1px solid ${can ? 'rgba(0,212,255,0.4)' : 'rgba(255,255,255,0.08)'}`,
-                  background: can ? 'rgba(0,212,255,0.08)' : 'rgba(255,255,255,0.02)',
-                  color: can ? '#00d4ff' : 'rgba(255,255,255,0.2)',
+                  border: 'rgba(0,212,255,0.4) solid 1px',
+                  background: 'rgba(0,212,255,0.08)',
+                  color: '#00d4ff',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  cursor: can ? 'pointer' : 'default',
-                  transition: 'all 0.2s ease',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s ease',
                 }}
-                onMouseEnter={e => can && (e.currentTarget.style.background = 'rgba(0,212,255,0.18)')}
-                onMouseLeave={e => can && (e.currentTarget.style.background = 'rgba(0,212,255,0.08)')}
+                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(0,212,255,0.18)'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'rgba(0,212,255,0.08)'; }}
               >
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                   {d === 'left'
@@ -1024,6 +1094,7 @@ export function Home() {
             overflow: 'hidden',
             padding: '8px clamp(24px, 5vw, 64px) 20px',
             cursor: isDragging ? 'grabbing' : 'grab',
+            visibility: ready ? 'visible' : 'hidden',
           }}
           onMouseDown={onMouseDown}
           onMouseMove={onMouseMove}
@@ -1031,37 +1102,28 @@ export function Home() {
           onMouseLeave={onMouseUp}
           onTouchStart={onTouchStart}
           onTouchMove={onTouchMove}
+          onTouchEnd={onTouchEnd}
         >
           <div
-            ref={trackRef}
             style={{
               display: 'flex',
               gap: `${CARD_GAP}px`,
               transform: `translateX(${offset}px)`,
-              transition: isDragging ? 'none' : 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1)',
+              transition: animated && !isDragging ? 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1)' : 'none',
               userSelect: 'none',
+              willChange: 'transform',
             }}
           >
-            {cursosVisiveis.map(course => {
-              if (!course.disponivel) return (
-                <LockedCourseCard
-                  key={course.id}
-                  course={course}
-                />
-              );
-              if (course.id === 'c2') return (
-                <ScifiCourseCard
-                  key={course.id}
-                  course={course}
-                  onClick={() => !isDragging && navigate(`/curso/${course.id}`)}
-                />
+            {tripled.map((course, idx) => {
+              const key = `${course.id}-${idx}`;
+              if (!course.disponivel) return <LockedCourseCard key={key} course={course} />;
+              if (course.id === 'c2' || course.slug === 'pensamento-computacional') return (
+                <ScifiCourseCard key={key} course={course}
+                  onClick={() => !isDragging && navigate(`/curso/${course.id}`)} />
               );
               return (
-                <CourseCard
-                  key={course.id}
-                  course={course}
-                  onClick={() => !isDragging && navigate(`/curso/${course.id}`)}
-                />
+                <CourseCard key={key} course={course}
+                  onClick={() => !isDragging && navigate(`/curso/${course.id}`)} />
               );
             })}
           </div>
@@ -1069,25 +1131,24 @@ export function Home() {
 
         {/* Dot indicators */}
         <div style={{ display: 'flex', justifyContent: 'center', gap: '6px', marginTop: '20px' }}>
-          {cursosVisiveis.map((_, i) => {
-            const pos = i * CARD_STEP;
-            const active = -offset >= pos - CARD_STEP && -offset <= pos + CARD_STEP;
-            return (
-              <div
-                key={i}
-                onClick={() => setOffset(Math.max(-pos, getMaxOffset()))}
-                style={{
-                  width: active ? '24px' : '6px',
-                  height: '6px',
-                  borderRadius: '3px',
-                  background: active ? '#00d4ff' : 'rgba(255,255,255,0.18)',
-                  boxShadow: active ? '0 0 8px rgba(0,212,255,0.5)' : 'none',
-                  transition: 'all 0.3s ease',
-                  cursor: 'pointer',
-                }}
-              />
-            );
-          })}
+          {cursosVisiveis.map((_, i) => (
+            <div
+              key={i}
+              onClick={() => {
+                setAnimated(true);
+                setOffset(normalize(-totalW - i * CARD_STEP));
+              }}
+              style={{
+                width: activeIdx === i ? '24px' : '6px',
+                height: '6px',
+                borderRadius: '3px',
+                background: activeIdx === i ? '#00d4ff' : 'rgba(255,255,255,0.18)',
+                boxShadow: activeIdx === i ? '0 0 8px rgba(0,212,255,0.5)' : 'none',
+                transition: 'all 0.3s ease',
+                cursor: 'pointer',
+              }}
+            />
+          ))}
         </div>
       </section>
 
