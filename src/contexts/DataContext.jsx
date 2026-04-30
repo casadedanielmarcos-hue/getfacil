@@ -14,9 +14,12 @@ const DataContext = createContext(null);
  * e resolve a URL correta para o conteúdo Rise 360.
  */
 function normalizeCurso(id, data) {
+  const hasValidLessons = (data.modulos || []).some(m =>
+    (m.aulas || []).some(a => a.arquivoUrl)
+  );
   return {
     id,
-    disponivel: true,
+    disponivel: hasValidLessons,
     title: data.titulo || '',
     subtitle: data.subtitulo || '',
     description: data.subtitulo || '',

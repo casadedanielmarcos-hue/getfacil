@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { LoginPage } from './pages/LoginPage';
+import { RoleSelector } from './pages/RoleSelector';
 import { Home } from './pages/Home';
 import { MeusCursos } from './pages/aluno/MeusCursos';
 import { CursoView } from './pages/aluno/CursoView';
@@ -11,7 +12,7 @@ import { CertificadoPage } from './pages/aluno/CertificadoPage';
 function App() {
   return (
     <Routes>
-      <Route path="/"                                          element={<Home />} />
+      <Route path="/"                                          element={<RoleSelector />} />
       <Route path="/login"                                     element={<LoginPage />} />
       <Route path="/home"                                      element={<Home />} />
       <Route path="/meus-cursos"                               element={<MeusCursos />} />

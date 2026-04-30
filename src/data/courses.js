@@ -63,41 +63,13 @@ export const courses = [
   },
   {
     id: 'c2',
-    disponivel: true,
     title: 'Pensamento Computacional',
     subtitle: 'Lógica e Resolução de Problemas',
     description: 'Desenvolva o raciocínio lógico e estruturado para resolver problemas complexos. Aprenda decomposição, padrões, abstração e algoritmos na prática.',
     coverColor: 'linear-gradient(135deg, #0a0a0f 0%, #0088ff 100%)',
     accentColor: '#0088ff',
     slug: 'pensamento-computacional',
-    modules: [
-      {
-        id: 'm1',
-        title: 'Módulo 1 - Fundamentos',
-        lessons: [
-          { id: 'introducao',  title: 'Introdução',                                          slug: 'Introdução', type: 'rise360' },
-          { id: 'capitulo-1', title: 'Capítulo 1: O Método para Decifrar o Futuro',          slug: 'Cap 1',      type: 'rise360' },
-          { id: 'desafio-1',  title: 'Desafio 1: Duas Lentes para a Sua Prática',            slug: 'Des 1',      type: 'rise360' },
-        ],
-      },
-      {
-        id: 'm2',
-        title: 'Módulo 2 - Aprofundamento',
-        lessons: [
-          { id: 'capitulo-2', title: 'Capítulo 2: Conectando Saberes',                       slug: 'Cap 2',      type: 'rise360' },
-          { id: 'desafio-2',  title: 'Desafio 2',                                            slug: 'Des 2',      type: 'rise360' },
-        ],
-      },
-      {
-        id: 'm3',
-        title: 'Módulo 3 - Avançado',
-        lessons: [
-          { id: 'capitulo-3', title: 'Capítulo 3: O Método para o Novo Mundo Digital',       slug: 'Cap 3',      type: 'rise360' },
-          { id: 'desafio-3',  title: 'Desafio 3',                                            slug: 'Des 3',      type: 'rise360' },
-          { id: 'materiais',  title: 'Materiais Complementares',                              slug: 'materiais',  type: 'rise360' },
-        ],
-      },
-    ],
+    modules: [],
   },
   {
     id: 'c3',
