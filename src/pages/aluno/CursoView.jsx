@@ -113,17 +113,19 @@ export function CursoView() {
     if (curso) ensureMatriculado(user.id, cursoId);
   }, [cursoId, curso]);
 
-  const progressoAluno = getProgressoCurso(user.id, cursoId);
+  const progressoAluno = getProgressoCurso(user.id, cursoId) || {
+    aulasAssistidas: [], modulosCompletos: [], avaliacoesFeitas: [],
+  };
   const percentualProgresso = calcularProgresso(cursoId, user.id);
 
   const todasAulasAssistidas = useMemo(() => {
-    if (!curso || !progressoAluno) return false;
+    if (!curso) return false;
     const total = curso.modules.reduce((acc, m) => acc + m.lessons.length, 0);
     return progressoAluno.aulasAssistidas.length >= total;
   }, [curso, progressoAluno]);
 
   const todasAvaliacoesModuloFeitas = useMemo(() => {
-    if (!curso || !progressoAluno) return false;
+    if (!curso) return false;
     const modulosComQuiz = curso.modules.filter(m => m.quiz);
     return modulosComQuiz.every(m =>
       progressoAluno.avaliacoesFeitas.some(a => a.avaliacaoId === m.quiz.id)
@@ -132,7 +134,7 @@ export function CursoView() {
 
   const podeAvaliacaoFinal = todasAulasAssistidas && todasAvaliacoesModuloFeitas;
 
-  if (!curso || !progressoAluno) {
+  if (!curso) {
     return (
       <div style={{ minHeight: '100vh', background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <StarfieldBackground />

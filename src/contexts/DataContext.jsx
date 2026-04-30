@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useRef } from 'react';
-import { doc, updateDoc, arrayUnion, collection, getDocs, query, where } from 'firebase/firestore';
+import { doc, updateDoc, arrayUnion, collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useAuth } from './AuthContext';
 import { courses as staticCourses } from '../data/courses';
@@ -14,12 +14,9 @@ const DataContext = createContext(null);
  * e resolve a URL correta para o conteúdo Rise 360.
  */
 function normalizeCurso(id, data) {
-  const hasValidLessons = (data.modulos || []).some(m =>
-    (m.aulas || []).some(a => a.arquivoUrl)
-  );
   return {
     id,
-    disponivel: hasValidLessons,
+    disponivel: data.publicado === true,
     title: data.titulo || '',
     subtitle: data.subtitulo || '',
     description: data.subtitulo || '',
@@ -84,7 +81,7 @@ export function DataProvider({ children }) {
    * Cursos estáticos que NÃO existem no Firestore são mantidos como fallback.
    */
   useEffect(() => {
-    getDocs(query(collection(db, 'cursos'), where('publicado', '==', true)))
+    getDocs(collection(db, 'cursos'))
       .then(snap => {
         const firestoreCursos = snap.docs.map(d => normalizeCurso(d.id, d.data()));
         const firestoreIds = new Set(firestoreCursos.flatMap(c => [c.id, c.slug].filter(Boolean)));

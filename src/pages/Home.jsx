@@ -1,7 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { addDoc, collection, getDocs, serverTimestamp } from 'firebase/firestore';
-import { db } from '../firebase';
 import { useData } from '../contexts/DataContext';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -612,8 +610,9 @@ function CourseCard({ course, onClick }) {
 }
 
 // ── Locked Course Card ───────────────────────────────────────────────────────
-function LockedCourseCard({ course, onSolicitarMatricula }) {
+function LockedCourseCard({ course }) {
   const [hovered, setHovered] = useState(false);
+  const accent = course.accentColor || '#00d4ff';
 
   return (
     <div
@@ -621,225 +620,56 @@ function LockedCourseCard({ course, onSolicitarMatricula }) {
       onMouseLeave={() => setHovered(false)}
       style={{ flexShrink: 0, width: '260px', height: '380px', borderRadius: '14px', cursor: 'default', position: 'relative', userSelect: 'none' }}
     >
-      {/* Dimmed card */}
       <div style={{
         position: 'absolute', inset: 0, borderRadius: '14px', overflow: 'hidden',
-        background: course.coverColor, border: '1px solid rgba(255,255,255,0.06)',
-        opacity: 0.5, filter: 'grayscale(50%)',
+        background: course.imagemCapa ? `url(${course.imagemCapa}) center/cover` : course.coverColor,
+        border: '1px solid rgba(255,255,255,0.06)',
+        opacity: hovered ? 0.6 : 0.45,
+        filter: 'grayscale(60%)',
+        transition: 'opacity 0.25s ease',
       }}>
         <div style={{
           position: 'absolute', inset: 0,
-          backgroundImage: 'linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)',
+          backgroundImage: 'linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)',
           backgroundSize: '24px 24px',
         }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.2) 50%, transparent 100%)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.3) 55%, transparent 100%)' }} />
 
         {/* Lock icon */}
         <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -60%)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
-          <svg width="30" height="30" viewBox="0 0 24 24" fill="none">
-            <rect x="3" y="11" width="18" height="11" rx="2" stroke="rgba(255,255,255,0.55)" strokeWidth="1.8" />
-            <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="rgba(255,255,255,0.55)" strokeWidth="1.8" strokeLinecap="round" />
-            <circle cx="12" cy="16.5" r="1.5" fill="rgba(255,255,255,0.55)" />
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+            <rect x="3" y="11" width="18" height="11" rx="2" stroke="rgba(255,255,255,0.4)" strokeWidth="1.8" />
+            <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="rgba(255,255,255,0.4)" strokeWidth="1.8" strokeLinecap="round" />
+            <circle cx="12" cy="16.5" r="1.5" fill="rgba(255,255,255,0.4)" />
           </svg>
-          <span style={{ fontFamily: 'var(--font-body)', fontSize: '0.62rem', fontWeight: '700', color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase', letterSpacing: '2.5px' }}>
-            Bloqueado
+          <span style={{ fontFamily: 'var(--font-body)', fontSize: '0.6rem', fontWeight: '700', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '2.5px' }}>
+            Em breve
           </span>
         </div>
 
         <div style={{ position: 'absolute', inset: 0, padding: '24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-          <div style={{ width: '52px', height: '52px', borderRadius: '12px', background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(8px)', border: `1px solid ${course.accentColor}22`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: `${course.accentColor}55` }}>
-            {ICONS[course.id]}
+          <div style={{ width: '52px', height: '52px', borderRadius: '12px', background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(8px)', border: `1px solid ${accent}22`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: `${accent}44` }}>
+            {ICONS[course.id] || (
+              <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                <path d="M6 8h16M6 14h10M6 20h12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+              </svg>
+            )}
           </div>
           <div>
-            <p style={{ fontSize: '0.7rem', fontWeight: '500', color: `${course.accentColor}55`, textTransform: 'uppercase', letterSpacing: '1.5px', fontFamily: 'var(--font-body)', marginBottom: '8px' }}>
+            <p style={{ fontSize: '0.7rem', fontWeight: '500', color: `${accent}44`, textTransform: 'uppercase', letterSpacing: '1.5px', fontFamily: 'var(--font-body)', marginBottom: '8px' }}>
               {course.subtitle}
             </p>
-            <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.2rem', fontWeight: '700', color: 'rgba(255,255,255,0.55)', lineHeight: '1.25' }}>
+            <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.2rem', fontWeight: '700', color: 'rgba(255,255,255,0.45)', lineHeight: '1.25' }}>
               {course.title}
             </h3>
           </div>
         </div>
-      </div>
-
-      {/* Tooltip — full opacity, slides up on hover */}
-      <div style={{
-        position: 'absolute', bottom: 0, left: 0, right: 0,
-        borderRadius: '0 0 14px 14px',
-        background: 'rgba(2,6,20,0.97)', backdropFilter: 'blur(16px)',
-        border: '1px solid rgba(0,212,255,0.25)', borderTop: '1px solid rgba(0,212,255,0.12)',
-        padding: '14px',
-        opacity: hovered ? 1 : 0,
-        transform: hovered ? 'translateY(0)' : 'translateY(6px)',
-        transition: 'opacity 0.2s ease, transform 0.2s ease',
-        pointerEvents: hovered ? 'all' : 'none',
-        zIndex: 10,
-      }}>
-        <p style={{ fontFamily: 'var(--font-body)', fontSize: '0.71rem', color: 'rgba(255,255,255,0.45)', textAlign: 'center', marginBottom: '10px', lineHeight: '1.45' }}>
-          Entre em contato com seu instrutor para ser matriculado
-        </p>
-        <button
-          onMouseDown={e => e.stopPropagation()}
-          onClick={() => onSolicitarMatricula(course)}
-          style={{
-            width: '100%', padding: '9px', borderRadius: '8px',
-            background: 'rgba(0,212,255,0.1)', border: '1px solid rgba(0,212,255,0.35)',
-            color: '#00d4ff', fontFamily: 'var(--font-body)', fontWeight: '600', fontSize: '0.8rem',
-            cursor: 'pointer', transition: 'background 0.2s ease',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
-          }}
-          onMouseEnter={e => { e.currentTarget.style.background = 'rgba(0,212,255,0.2)'; }}
-          onMouseLeave={e => { e.currentTarget.style.background = 'rgba(0,212,255,0.1)'; }}
-        >
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
-            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
-            <path d="M22 6L12 13 2 6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-          Solicitar Matrícula
-        </button>
       </div>
     </div>
   );
 }
 
 // ── Solicitation Modal ───────────────────────────────────────────────────────
-function SolicitacaoModal({ curso, user, onClose }) {
-  const [mensagem, setMensagem] = useState(`Gostaria de ser matriculado no curso "${curso.title}".`);
-  const [instrutorNome, setInstrutorNome] = useState('');
-  const [gestores, setGestores] = useState([]);
-  const [enviando, setEnviando] = useState(false);
-  const [enviado, setEnviado] = useState(false);
-
-  useEffect(() => {
-    getDocs(collection(db, 'gestores'))
-      .then(snap => setGestores(snap.docs.map(d => ({ id: d.id, ...d.data() }))))
-      .catch(() => {});
-  }, []);
-
-  const handleEnviar = async () => {
-    if (!instrutorNome.trim()) return;
-    setEnviando(true);
-    try {
-      await addDoc(collection(db, 'solicitudes-matricula'), {
-        alunoId: user.id,
-        alunoNome: user.nome,
-        alunoEmail: user.email,
-        cursoId: curso.id,
-        cursoNome: curso.title,
-        instrutorNome: instrutorNome.trim(),
-        mensagem: mensagem.trim(),
-        status: 'pendente',
-        criadoEm: serverTimestamp(),
-      });
-      setEnviado(true);
-    } catch (err) {
-      console.error('Erro ao enviar solicitação:', err);
-    } finally {
-      setEnviando(false);
-    }
-  };
-
-  return (
-    <div
-      style={{ position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(0,0,0,0.78)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}
-      onClick={e => e.target === e.currentTarget && onClose()}
-    >
-      <div style={{
-        width: '100%', maxWidth: '440px',
-        background: 'rgba(4,8,22,0.97)', border: '1px solid rgba(0,212,255,0.2)',
-        borderRadius: '16px', padding: '32px', position: 'relative',
-        boxShadow: '0 0 60px rgba(0,212,255,0.08), 0 32px 80px rgba(0,0,0,0.7)',
-      }}>
-        <div style={{ position: 'absolute', top: 0, left: '20%', right: '20%', height: '1px', background: 'linear-gradient(90deg, transparent, rgba(0,212,255,0.5), transparent)' }} />
-
-        <button
-          onClick={onClose}
-          style={{ position: 'absolute', top: '14px', right: '14px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', color: 'rgba(255,255,255,0.5)', width: '28px', height: '28px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-body)', fontSize: '1rem', transition: 'all 0.2s ease' }}
-          onMouseEnter={e => { e.currentTarget.style.color = '#ffffff'; e.currentTarget.style.background = 'rgba(255,255,255,0.12)'; }}
-          onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.5)'; e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; }}
-        >×</button>
-
-        <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', fontWeight: '700', color: '#ffffff', marginBottom: '4px' }}>
-          Solicitar Matrícula
-        </h2>
-        <p style={{ fontFamily: 'var(--font-body)', fontSize: '0.78rem', color: 'rgba(0,212,255,0.7)', marginBottom: '24px' }}>
-          {curso.title}
-        </p>
-
-        {enviado ? (
-          <div style={{ textAlign: 'center', padding: '20px 0' }}>
-            <div style={{ fontSize: '2.2rem', marginBottom: '14px' }}>✅</div>
-            <p style={{ fontFamily: 'var(--font-body)', fontWeight: '700', color: '#00ff88', fontSize: '1rem', marginBottom: '8px' }}>
-              Solicitação enviada!
-            </p>
-            <p style={{ fontFamily: 'var(--font-body)', fontSize: '0.82rem', color: 'rgba(255,255,255,0.45)', lineHeight: '1.5' }}>
-              Em breve você receberá uma resposta.
-            </p>
-            <button onClick={onClose} style={{ marginTop: '20px', padding: '10px 28px', borderRadius: '8px', background: 'rgba(0,255,136,0.1)', border: '1px solid rgba(0,255,136,0.3)', color: '#00ff88', fontFamily: 'var(--font-body)', fontWeight: '600', cursor: 'pointer' }}>
-              Fechar
-            </button>
-          </div>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <div>
-              <label style={{ display: 'block', fontSize: '0.78rem', color: 'rgba(255,255,255,0.45)', fontFamily: 'var(--font-body)', marginBottom: '6px' }}>Seu e-mail</label>
-              <input readOnly value={user.email} style={{ width: '100%', padding: '11px 14px', boxSizing: 'border-box', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'rgba(255,255,255,0.4)', fontFamily: 'var(--font-body)', fontSize: '0.9rem', outline: 'none' }} />
-            </div>
-
-            <div>
-              <label style={{ display: 'block', fontSize: '0.78rem', color: 'rgba(255,255,255,0.45)', fontFamily: 'var(--font-body)', marginBottom: '6px' }}>Instrutor</label>
-              {gestores.length > 0 ? (
-                <select
-                  value={instrutorNome}
-                  onChange={e => setInstrutorNome(e.target.value)}
-                  style={{ width: '100%', padding: '11px 14px', boxSizing: 'border-box', background: 'rgba(8,12,28,0.9)', border: `1px solid ${instrutorNome ? 'rgba(0,212,255,0.5)' : 'rgba(0,212,255,0.2)'}`, borderRadius: '8px', color: instrutorNome ? '#ffffff' : 'rgba(255,255,255,0.35)', fontFamily: 'var(--font-body)', fontSize: '0.9rem', cursor: 'pointer', outline: 'none' }}
-                >
-                  <option value="">Selecione o instrutor</option>
-                  {gestores.map(g => <option key={g.id} value={g.nome || g.email}>{g.nome || g.email}</option>)}
-                </select>
-              ) : (
-                <input
-                  value={instrutorNome}
-                  onChange={e => setInstrutorNome(e.target.value)}
-                  placeholder="Nome do instrutor"
-                  style={{ width: '100%', padding: '11px 14px', boxSizing: 'border-box', background: 'rgba(255,255,255,0.05)', border: `1px solid ${instrutorNome ? 'rgba(0,212,255,0.5)' : 'rgba(0,212,255,0.2)'}`, borderRadius: '8px', color: '#ffffff', fontFamily: 'var(--font-body)', fontSize: '0.9rem', outline: 'none' }}
-                />
-              )}
-            </div>
-
-            <div>
-              <label style={{ display: 'block', fontSize: '0.78rem', color: 'rgba(255,255,255,0.45)', fontFamily: 'var(--font-body)', marginBottom: '6px' }}>Mensagem</label>
-              <textarea
-                value={mensagem}
-                onChange={e => setMensagem(e.target.value)}
-                rows={4}
-                style={{ width: '100%', padding: '11px 14px', boxSizing: 'border-box', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(0,212,255,0.2)', borderRadius: '8px', color: '#ffffff', fontFamily: 'var(--font-body)', fontSize: '0.9rem', resize: 'vertical', outline: 'none', lineHeight: '1.5' }}
-              />
-            </div>
-
-            <button
-              onClick={handleEnviar}
-              disabled={enviando || !instrutorNome.trim()}
-              style={{
-                padding: '13px',
-                background: enviando || !instrutorNome.trim() ? 'rgba(0,212,255,0.3)' : '#00d4ff',
-                color: '#000', border: 'none', borderRadius: '8px',
-                fontFamily: 'var(--font-body)', fontWeight: '700', fontSize: '0.92rem',
-                cursor: enviando || !instrutorNome.trim() ? 'not-allowed' : 'pointer',
-                boxShadow: !enviando && instrutorNome.trim() ? '0 0 20px rgba(0,212,255,0.3)' : 'none',
-                transition: 'all 0.2s ease',
-              }}
-              onMouseEnter={e => { if (!enviando && instrutorNome.trim()) e.currentTarget.style.background = '#33ddff'; }}
-              onMouseLeave={e => { if (!enviando && instrutorNome.trim()) e.currentTarget.style.background = '#00d4ff'; }}
-            >
-              {enviando ? 'Enviando...' : 'Enviar Solicitação'}
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
 // ── Home Page ───────────────────────────────────────────────────────────────
 const CARD_W = 260;
 const CARD_GAP = 20;
@@ -852,11 +682,9 @@ export function Home() {
   const coursesRef = useRef(null);
   const trackRef = useRef(null);
 
-  const matriculados = (user?.cursosMatriculados || []).map(c => typeof c === 'string' ? c : c?.id).filter(Boolean);
   const cursosVisiveis = cursos;
 
   const [offset, setOffset] = useState(0);
-  const [solicitacaoModal, setSolicitacaoModal] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStartX, setDragStartX] = useState(0);
 
@@ -1219,7 +1047,6 @@ export function Home() {
                 <LockedCourseCard
                   key={course.id}
                   course={course}
-                  onSolicitarMatricula={() => setSolicitacaoModal(course)}
                 />
               );
               if (course.id === 'c2') return (
@@ -1264,13 +1091,6 @@ export function Home() {
         </div>
       </section>
 
-      {solicitacaoModal && (
-        <SolicitacaoModal
-          curso={solicitacaoModal}
-          user={user}
-          onClose={() => setSolicitacaoModal(null)}
-        />
-      )}
     </div>
   );
 }
