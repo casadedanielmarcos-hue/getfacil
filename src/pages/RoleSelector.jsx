@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const PORTAL_URL = 'https://casadedanielmarcos-hue.github.io/portal-gestor/';
+const PORTAL_URL = 'https://casadedanielmarcos-hue.github.io/getfacil/portal/';
 
 function BackgroundMesh() {
   const canvasRef = useRef(null);

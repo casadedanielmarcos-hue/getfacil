@@ -3,5 +3,9 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  base: '/portal-gestor/',
+  base: '/getfacil/portal/',
+  build: {
+    outDir: '../dist/portal',
+    emptyOutDir: true,
+  },
 })
